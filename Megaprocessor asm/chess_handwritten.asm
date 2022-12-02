@@ -83,10 +83,38 @@ NOP;
 //  7  7  7  7  7  7  7  7  7  7
 
 // *************************************
+// Constants
 
-// *********************
+INT_RAM_START EQU 0xA000;
+
+SQUARE_INDEX_A8 EQU 21;
+
+// *************************************
+// draw_piece
+
+draw_piece_return_address: DW;
+NOP;
+NOP;
+NOP;
+
+draw_piece:
+                                            // void draw_piece(square_index)
+                                            // {
+ST.W draw_piece_return_address, R0;
+
+LD.W R0, draw_piece_return_address;
+JMP (R0);                                   //     return;
+                                            // }
+
+// *************************************
 // The program....
 start:
+
+                                            // draw_piece(Square.A8)
+LD.B R1, #SQUARE_INDEX_A8;
+LD.W R0, #return_start_0;
+JMP draw_piece;
+return_start_0:
 NOP;
 
 infinite_loop:
