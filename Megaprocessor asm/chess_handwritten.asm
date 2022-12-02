@@ -254,6 +254,8 @@ SQUARE_INDEX_A8 EQU 21;
 draw_piece_return_address: DW;
 draw_piece_square_index: DB;
 draw_piece_board_value: DB;
+draw_piece_piece_value: DB;
+draw_piece_piece_representation_address: DW;
 NOP;
 NOP;
 NOP;
@@ -268,6 +270,17 @@ LD.B R2, #board;
 ADD R2,R1;
 LD.B R0, (R2);
 ST.B draw_piece_board_value, R0;            //     board_value = board[square_index]; 
+
+LD.B R3, #0b00001111;
+AND R0, R3;
+ST.B draw_piece_piece_value, R0;            //     piece_value = board_value & 0b00001111; 
+
+LD.W R2, #piece_representation;
+ADD R2,R0;
+ADD R2,R0; // twice because each address is a word
+LD.W R0, (R2);
+ST.B draw_piece_piece_representation_address, R0; //  piece_representation_address = piece_representation[piece_value]; 
+
 
 LD.W R0, draw_piece_return_address;
 JMP (R0);                                   //     return;
