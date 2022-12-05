@@ -152,6 +152,24 @@ BNE draw_board_loop;                 //         if (loop_file_index != 0) { cont
                                      //     }
                                      // }
 
+LD.W R0,#0b0000000000000000;
+ST.W (0xA0E0),R0;
+ST.W (0xA0E2),R0;
+ST.W (0xA0E4),R0;
+ST.W (0xA0E6),R0;
+ST.W (0xA0E8),R0;
+ST.W (0xA0EA),R0;
+ST.W (0xA0EC),R0;
+ST.W (0xA0EE),R0;
+ST.W (0xA0F0),R0;
+ST.W (0xA0F2),R0;
+ST.W (0xA0F4),R0;
+ST.W (0xA0F6),R0;
+ST.W (0xA0F8),R0;
+ST.W (0xA0FA),R0;
+ST.W (0xA0FC),R0;
+ST.W (0xA0FE),R0;
+
 infinite_loop:
 NOP;
 JMP infinite_loop;
