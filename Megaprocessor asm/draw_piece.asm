@@ -1,22 +1,22 @@
 // *************************************
 // Sprites
 
-empty_square_sprite:
+black_square_sprite:
 DB 0b00000000; // left
-DB 0b00000000;
-DB 0b00000000;
-DB 0b00000000;
-DB 0b00000000;
-DB 0b00000000;
-DB 0b00000000;
+DB 0b00001010;
+DB 0b00000100;
+DB 0b00001010;
+DB 0b00000100;
+DB 0b00001010;
+DB 0b00000100;
 
 DB 0b00000000; // right
-DB 0b00000000;
-DB 0b00000000;
-DB 0b00000000;
-DB 0b00000000;
-DB 0b00000000;
-DB 0b00000000;
+DB 0b10100000;
+DB 0b01000000;
+DB 0b10100000;
+DB 0b01000000;
+DB 0b10100000;
+DB 0b01000000;
 
 black_pawn_sprite:
 DB 0b00000000; // left
@@ -119,6 +119,23 @@ DB 0b10100000; // █ █
 DB 0b10100000; // █ █
 DB 0b01100000; // ██
 DB 0b10000000; //   █
+
+white_square_sprite:
+DB 0b00000000; // left
+DB 0b00000000;
+DB 0b00000000;
+DB 0b00000000;
+DB 0b00000000;
+DB 0b00000000;
+DB 0b00000000;
+
+DB 0b00000000; // right
+DB 0b00000000;
+DB 0b00000000;
+DB 0b00000000;
+DB 0b00000000;
+DB 0b00000000;
+DB 0b00000000;
 
 white_pawn_sprite:
 DB 0b00000000; // left
@@ -223,7 +240,7 @@ DB 0b10000000; //   █
 DB 0b10000000; //   █
 
 piece_sprite_addresses:
-DW empty_square_sprite;
+DW black_square_sprite;
 DW black_pawn_sprite;
 DW black_king_sprite;
 DW black_knight_sprite;
@@ -231,7 +248,7 @@ DW black_bishop_sprite;
 DW black_rook_sprite;
 DW black_queen_sprite;
 DW;
-DW;
+DW white_square_sprite;
 DW white_pawn_sprite;
 DW white_king_sprite;
 DW white_knight_sprite;
@@ -263,7 +280,31 @@ ADD R2,R1;
 LD.B R0, (R2);                              //     board_value = board[square_index]; 
 
 LD.B R3, #0b00001111;
-AND R0, R3;                                 //     piece_value = board_value & 0b00001111; 
+AND R0, R3;                                 //     piece_value = board_value & 0b00001111;
+BNE draw_piece_empty_square_check_end;      //     if (piece_value != 0) {}
+                                            //     else
+                                            //     {
+LD.B R3, #0b00000001;
+AND R3, R1;
+BEQ draw_piece_even_square_check_end;       //         if (square_index % 2 == 0) {}
+                                            //         else {
+LD.B R3, #0b00001000;
+XOR R0, R3;                                 //             piece_value ^= 0b1000;
+                                            //         }
+draw_piece_even_square_check_end:
+
+MOVE R2,R1;                                 //         for(n = square_index; square_index > 0; n-=10)
+draw_piece_square_colour_loop:              //         {
+LD.B R3, #0b00001010;
+SUB R2,R3;
+BMI draw_piece_empty_square_check_end;
+LD.B R3, #0b00001000;
+XOR R0, R3;                                 //             piece_value ^= 0b1000;
+JMP draw_piece_square_colour_loop;          //         }
+                                            //     }
+draw_piece_empty_square_check_end:
+
+
 
 LD.W R2, #piece_sprite_addresses;
 ADD R2,R0;
