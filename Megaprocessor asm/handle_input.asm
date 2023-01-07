@@ -33,8 +33,31 @@ LD.B R2,#10;
 ADD R3,R2;                               //         newCursorIndex += 10;
 JMP move_if_new_cursor_still_on_board;   //         move_if_new_cursor_still_on_board(oldCursorIndex);
                                          //         return;
-handle_input_down_is_not_pressed:          //     }
+handle_input_down_is_not_pressed:        //     }
 
+LD.W R1,#IO_SWITCH_FLAG_LEFT;
+AND R1,R0;
+BNE handle_input_left_is_not_pressed;    //     if(GEN_IO_INPUT & IO_SWITCH_FLAG_LEFT != 0) {
+                                         //     } else {
+LD.B R3,global_cursor_square_index;      //         var newCursorIndex = global_cursor_square_index;
+MOVE R1, R3;                             //         var oldCursorIndex = global_cursor_square_index;
+LD.B R2,#1;
+SUB R3,R2;                               //         newCursorIndex -= 1;
+JMP move_if_new_cursor_still_on_board;   //         move_if_new_cursor_still_on_board(oldCursorIndex);
+                                         //         return;
+handle_input_left_is_not_pressed:        //     }
+
+LD.W R1,#IO_SWITCH_FLAG_RIGHT;
+AND R1,R0;
+BNE handle_input_right_is_not_pressed;   //     if(GEN_IO_INPUT & IO_SWITCH_FLAG_RIGHT != 0) {
+                                         //     } else {
+LD.B R3,global_cursor_square_index;      //         var newCursorIndex = global_cursor_square_index;
+MOVE R1, R3;                             //         var oldCursorIndex = global_cursor_square_index;
+LD.B R2,#1;
+ADD R3,R2;                               //         newCursorIndex -= 1;
+JMP move_if_new_cursor_still_on_board;   //         move_if_new_cursor_still_on_board(oldCursorIndex);
+                                         //         return;
+handle_input_right_is_not_pressed:       //     }
 
 JMP handle_input_return;                 //     return;
                                          // }
