@@ -3,8 +3,8 @@
 LD.B R0, get_input_input_is_clear;
 BNE get_input_wait_for_input;            //     if(get_input_input_is_clear == true) {          // i.e get_input_input_is_clear != 0
                                          //     } else {
-LD.W R0,GEN_IO_INPUT;                    //         var invertedInput = GEN_IO_INPUT;
-INV R0;                                  //         invertedInput = !invertedInput; // all 0's if nothing pushed
+LD.W R0,GEN_IO_INPUT;
+INV R0;                                  //         var invertedInput = ~GEN_IO_INPUT; // all 0's if nothing pushed
 BNE get_input_not_clear;                 //         if (invertedInput != 0) {
                                          //         }
                                          //         else {
@@ -16,8 +16,8 @@ JMP get_input_return;                    //         return 0;
                                          //     }
 
 get_input_wait_for_input:                //     if(get_input_input_is_clear == true) {          // i.e get_input_input_is_clear != 0
-LD.W R0,GEN_IO_INPUT;                    //         var invertedInput = GEN_IO_INPUT;
-INV R0;                                  //         invertedInput = !invertedInput; // all 0's if nothing pushed
+LD.W R0,GEN_IO_INPUT;
+INV R0;                                  //         var invertedInput = ~GEN_IO_INPUT; // all 0's if nothing pushed
 BEQ get_input_clear;                     //         if (invertedInput == 0) {
                                          //         }
                                          //         else {
