@@ -119,23 +119,15 @@ include "draw_board.asm";
 SQUARE_INDEX_A8 EQU 21;
 SQUARE_INDEX_A1 EQU 91;
 
-
 // To handle the peripherals:
 PERIPHERALS_BASE                equ     0x8000;
 GEN_IO_BASE                     equ     PERIPHERALS_BASE + 0x30;
 GEN_IO_INPUT                    equ     GEN_IO_BASE + 2;
 
-// (Switches are HIGH by "default", and go LOW on being pressed).
-IO_SWITCH_FLAG_UP               EQU     0x0001;
-IO_SWITCH_FLAG_DOWN             EQU     0x0002;
-IO_SWITCH_FLAG_LEFT             EQU     0x0004;
-IO_SWITCH_FLAG_RIGHT            EQU     0x0008;
-
 // *************************************
 // The program....
 
-global_new_cursor_square: DB SQUARE_INDEX_A1;
-global_displayed_cursor_square: DB SQUARE_INDEX_A1;
+global_cursor_square_index: DB SQUARE_INDEX_A1;
 
 NOP;
 NOP;
@@ -150,13 +142,15 @@ NOP;
 infinite_loop:                           // do {
 NOP;
 
-LD.B R1, global_displayed_cursor_square;
+LD.B R1, global_cursor_square_index;
 LD.W R0, #main_return_from_draw_piece;
-JMP draw_piece;                          //         draw_piece(global_displayed_cursor_square)
+JMP draw_piece;                          //         draw_piece(global_cursor_square_index)
 main_return_from_draw_piece:
 NOP;
 
 include "get_input.asm";                 //         var input = get_input();
+
+include "handle_input.asm";
 
 JMP infinite_loop;                       // } loop
 

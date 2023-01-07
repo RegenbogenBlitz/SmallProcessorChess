@@ -294,9 +294,9 @@ JMP draw_piece_square_colour_loop;          //         }
 draw_piece_empty_square_check_end:
 
 
-LD.B R2, global_displayed_cursor_square;    //
+LD.B R2, global_cursor_square_index;        //
 CMP R2,R1;
-BNE draw_piece_select_piece_sprite;         //     if(global_displayed_cursor_square == square_index) {
+BNE draw_piece_select_piece_sprite;         //     if(global_cursor_square_index == square_index) {
 LD.W R2, draw_piece_flash_state;
 INC R2;
 ST.W draw_piece_flash_state, R2;            //         draw_piece_flash_state++;
@@ -308,7 +308,7 @@ ST.W draw_piece_sprite_address,R0;          //             piece_sprite_address 
 JMP draw_piece_sprite_selected;             //         }
                                             //     }
 
-draw_piece_select_piece_sprite:             //     if(global_displayed_cursor_square != square_index || draw_piece_flash_bit == 0)
+draw_piece_select_piece_sprite:             //     if(global_cursor_square_index != square_index || draw_piece_flash_bit == 0)
 LD.W R2, #piece_sprite_addresses;
 ADD R2,R0;
 ADD R2,R0; // twice because each address is a word
