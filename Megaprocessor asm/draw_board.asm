@@ -41,6 +41,22 @@ BNE draw_board_loop;                 //             if (loop_file_index != 0) { 
                                      //     }
 
 LD.W R0,#0b0000000000000000;
+ST.W (0xA0C0),R0;
+ST.W (0xA0C2),R0;
+ST.W (0xA0C4),R0;
+ST.W (0xA0C6),R0;
+ST.W (0xA0C8),R0;
+ST.W (0xA0CA),R0;
+ST.W (0xA0CC),R0;
+ST.W (0xA0CE),R0;
+ST.W (0xA0D0),R0;
+ST.W (0xA0D2),R0;
+ST.W (0xA0D4),R0;
+ST.W (0xA0D6),R0;
+ST.W (0xA0D8),R0;
+ST.W (0xA0DA),R0;
+ST.W (0xA0DC),R0;
+ST.W (0xA0DE),R0;
 ST.W (0xA0E0),R0;
 ST.W (0xA0E2),R0;
 ST.W (0xA0E4),R0;

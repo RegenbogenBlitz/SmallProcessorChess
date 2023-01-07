@@ -8,7 +8,6 @@ DB 0b00000100; //  █
 DB 0b00001010; // █ █
 DB 0b00000100; //  █
 DB 0b00001010; // █ █
-DB 0b00000100; //  █
 
 DB 0b00000000; // right
 DB 0b10100000; // █ █
@@ -16,7 +15,6 @@ DB 0b01000000; //  █
 DB 0b10100000; // █ █
 DB 0b01000000; //  █
 DB 0b10100000; // █ █
-DB 0b01000000; //  █
 
 black_pawn_sprite:
 DB 0b00000000; // left
@@ -25,13 +23,11 @@ DB 0b00001010; // █ █
 DB 0b00001110; // ███
 DB 0b00000010; // █
 DB 0b00000010; // █
-DB 0b00000010; // █
 
 DB 0b00000000; // right
 DB 0b11100000; // ███
 DB 0b10100000; // █ █
 DB 0b11100000; // ███
-DB 0b00100000; // █
 DB 0b00100000; // █
 DB 0b00100000; // █
 
@@ -42,13 +38,11 @@ DB 0b00001010; // █ █
 DB 0b00000110; // ██
 DB 0b00001010; // █ █
 DB 0b00001010; // █ █
-DB 0b00001010; // █ █
 
 DB 0b00000000; // right
 DB 0b10100000; // █ █
 DB 0b10100000; // █ █
 DB 0b01100000; // ██
-DB 0b10100000; // █ █
 DB 0b10100000; // █ █
 DB 0b10100000; // █ █
 
@@ -59,13 +53,11 @@ DB 0b00001010; // █ █
 DB 0b00001110; // ███
 DB 0b00001010; // █ █
 DB 0b00001010; // █ █
-DB 0b00001010; // █ █
 
 DB 0b00000000; // right
 DB 0b10100000; // █ █
 DB 0b10100000; // █ █
 DB 0b11100000; // ███
-DB 0b10100000; // █ █
 DB 0b10100000; // █ █
 DB 0b10100000; // █ █
 
@@ -75,14 +67,12 @@ DB 0b00001110; // ███
 DB 0b00001010; // █ █
 DB 0b00000110; // ██
 DB 0b00001010; // █ █
-DB 0b00001010; // █ █
 DB 0b00001110; // ███
 
 DB 0b00000000; // right
 DB 0b11100000; // ███
 DB 0b10100000; // █ █
 DB 0b01100000; // ██
-DB 0b10100000; // █ █
 DB 0b10100000; // █ █
 DB 0b11100000; // ███
 
@@ -93,7 +83,6 @@ DB 0b00001010; // █ █
 DB 0b00001110; // ███
 DB 0b00000110; // ██
 DB 0b00001010; // █ █
-DB 0b00001010; // █ █
 
 DB 0b00000000; // right
 DB 0b11100000; // ███
@@ -101,12 +90,10 @@ DB 0b10100000; // █ █
 DB 0b11100000; // ███
 DB 0b01100000; // ██
 DB 0b10100000; // █ █
-DB 0b10100000; // █ █
 
 black_queen_sprite:
 DB 0b00000000; // left
 DB 0b00001110; // ███
-DB 0b00001010; // █ █
 DB 0b00001010; // █ █
 DB 0b00001010; // █ █
 DB 0b00000110; // ██
@@ -114,7 +101,6 @@ DB 0b00001000; //   █
 
 DB 0b00000000; // right
 DB 0b11100000; // ███
-DB 0b10100000; // █ █
 DB 0b10100000; // █ █
 DB 0b10100000; // █ █
 DB 0b01100000; // ██
@@ -127,10 +113,8 @@ DB 0b00000000;
 DB 0b00000000;
 DB 0b00000000;
 DB 0b00000000;
-DB 0b00000000;
 
 DB 0b00000000; // right
-DB 0b00000000;
 DB 0b00000000;
 DB 0b00000000;
 DB 0b00000000;
@@ -144,7 +128,6 @@ DB 0b00000100; //  █
 DB 0b00001010; // █ █
 DB 0b00000110; // ██
 DB 0b00000010; // █
-DB 0b00000010; // █
 
 DB 0b00000000; // right
 DB 0b00000000;
@@ -152,12 +135,10 @@ DB 0b01000000; //  █
 DB 0b10100000; // █ █
 DB 0b01100000; // ██
 DB 0b00100000; // █
-DB 0b00100000; // █
 
 white_king_sprite:
 DB 0b00000000; // left
 DB 0b00000000;
-DB 0b00000010; // █
 DB 0b00000010; // █
 DB 0b00001010; // █ █
 DB 0b00000110; // ██
@@ -165,7 +146,6 @@ DB 0b00001010; // █ █
 
 DB 0b00000000; // right
 DB 0b00000000;
-DB 0b00100000; // █
 DB 0b00100000; // █
 DB 0b10100000; // █ █
 DB 0b01100000; // ██
@@ -176,30 +156,26 @@ DB 0b00000000; // left
 DB 0b00000000;
 DB 0b00000010; // █
 DB 0b00000010; // █
-DB 0b00000110; // ██
-DB 0b00001010; // █ █
+DB 0b00001110; // ███
 DB 0b00001010; // █ █
 
 DB 0b00000000; // right
 DB 0b00000000;
 DB 0b00100000; // █
 DB 0b00100000; // █
-DB 0b01100000; // ██
-DB 0b10100000; // █ █
+DB 0b11100000; // ███
 DB 0b10100000; // █ █
 
 white_bishop_sprite:
 DB 0b00000000; // left
 DB 0b00000000;
 DB 0b00000010; // █
-DB 0b00000010; // █
 DB 0b00000110; // ██
 DB 0b00001010; // █ █
 DB 0b00000110; // ██
 
 DB 0b00000000; // right
 DB 0b00000000;
-DB 0b00100000; // █
 DB 0b00100000; // █
 DB 0b01100000; // ██
 DB 0b10100000; // █ █
@@ -208,14 +184,12 @@ DB 0b01100000; // ██
 white_rook_sprite:
 DB 0b00000000; // left
 DB 0b00000000;
-DB 0b00000000;
 DB 0b00000100; //  █
 DB 0b00001010; // █ █
 DB 0b00000010; // █
 DB 0b00000010; // █
 
 DB 0b00000000; // right
-DB 0b00000000;
 DB 0b00000000;
 DB 0b01000000; //  █
 DB 0b10100000; // █ █
@@ -229,14 +203,12 @@ DB 0b00001100; //  ██
 DB 0b00001010; // █ █
 DB 0b00001100; //  ██
 DB 0b00001000; //   █
-DB 0b00001000; //   █
 
 DB 0b00000000; // right
 DB 0b00000000;
 DB 0b11000000; //  ██
 DB 0b10100000; // █ █
 DB 0b11000000; //  ██
-DB 0b10000000; //   █
 DB 0b10000000; //   █
 
 piece_sprite_addresses:
@@ -324,8 +296,8 @@ BMI draw_piece_rank_is_8_7_6_5;             //     if (square_index < 40) {}
                                             //     else
                                             //     {
 MOVE R1,R0;                                 //         square_index -= 40;
-LD.W R3,#0x0070;
-ADD R2,R3;                                  //         led_byte_address += 0x0070;
+LD.W R3,#0x0060;
+ADD R2,R3;                                  //         led_byte_address += 0x0060;
 draw_piece_rank_is_8_7_6_5:                 //     }
 
 MOVE R0, R1; // move R1 to R0
@@ -335,8 +307,8 @@ BMI draw_piece_rank_is_8_7_4_3;             //     if (square_index < 20) {}
                                             //     else
                                             //     {
 MOVE R1,R0;                                 //         square_index -= 20;
-LD.W R3,#0x0038;
-ADD R2,R3;                                  //         led_byte_address += 0x0038;
+LD.W R3,#0x0030;
+ADD R2,R3;                                  //         led_byte_address += 0x0030;
 draw_piece_rank_is_8_7_4_3:                 //     }
 
 MOVE R0, R1; // move R1 to R0
@@ -346,8 +318,8 @@ BMI draw_piece_rank_is_8_6_4_2;             //     if (square_index < 10) {}
                                             //     else
                                             //     {
 MOVE R1,R0;                                 //         square_index -= 10;
-LD.W R3,#0x001C;
-ADD R2,R3;                                  //         led_byte_address += 0x001C;
+LD.W R3,#0x0018;
+ADD R2,R3;                                  //         led_byte_address += 0x0018;
 draw_piece_rank_is_8_6_4_2:                 //     }
 
 BTST R1,#2;
@@ -372,10 +344,9 @@ BTST R1,#0;
 BEQ draw_piece_rank_is_A_C_E_G;             //     if (square_index & 00000001 == 0) {}
                                             //     else
                                             //     {
-LD.W R1, #7;
-ADD R3,R1;                                  //         piece_sprite_row_address += 7;
+LD.W R1, #6;
+ADD R3,R1;                                  //         piece_sprite_row_address += 6;
 
-include "draw_right_sprite_row.asm";        //         piece_sprite_row_address = draw_right_sprite_row(piece_sprite_row_address);
 include "draw_right_sprite_row.asm";        //         piece_sprite_row_address = draw_right_sprite_row(piece_sprite_row_address);
 include "draw_right_sprite_row.asm";        //         piece_sprite_row_address = draw_right_sprite_row(piece_sprite_row_address);
 include "draw_right_sprite_row.asm";        //         piece_sprite_row_address = draw_right_sprite_row(piece_sprite_row_address);
@@ -389,7 +360,6 @@ NOP;
                                             //     if (square_index & 00000001 == 0)
                                             //     {
 
-include "draw_left_sprite_row.asm";          //         piece_sprite_row_address = draw_left_sprite_row(piece_sprite_row_address);
 include "draw_left_sprite_row.asm";          //         piece_sprite_row_address = draw_left_sprite_row(piece_sprite_row_address);
 include "draw_left_sprite_row.asm";          //         piece_sprite_row_address = draw_left_sprite_row(piece_sprite_row_address);
 include "draw_left_sprite_row.asm";          //         piece_sprite_row_address = draw_left_sprite_row(piece_sprite_row_address);
