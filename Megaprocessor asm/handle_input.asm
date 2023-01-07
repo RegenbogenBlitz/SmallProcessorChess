@@ -19,12 +19,7 @@ LD.B R3,global_cursor_square_index;      //         var newCursorIndex = global_
 MOVE R1, R3;                             //         var oldCursorIndex = global_cursor_square_index;
 LD.B R2,#10;
 SUB R3,R2;                               //         newCursorIndex -= 10;
-LD.B R2,#SQUARE_INDEX_A8;
-CMP R3,R2;
-BLT handle_input_return;                 //         if(newCursorIndex < SQUARE_INDEX_A8) { return; }
-
-ST.B global_cursor_square_index, R3;     //         global_cursor_square_index = newCursorIndex;
-JMP handle_input_remove_old_cursor;      //         remove_old_cursor(oldCursorIndex);
+JMP move_if_new_cursor_still_on_board;   //         move_if_new_cursor_still_on_board(oldCursorIndex);
                                          //         return;
 handle_input_up_is_not_pressed:          //     }
 
@@ -36,12 +31,7 @@ LD.B R3,global_cursor_square_index;      //         var newCursorIndex = global_
 MOVE R1, R3;                             //         var oldCursorIndex = global_cursor_square_index;
 LD.B R2,#10;
 ADD R3,R2;                               //         newCursorIndex += 10;
-LD.B R2,#SQUARE_INDEX_H1;
-CMP R3,R2;
-BGT handle_input_return;                 //         if(newCursorIndex > SQUARE_INDEX_H1) { return; }
-
-ST.B global_cursor_square_index, R3;     //         global_cursor_square_index = newCursorIndex;
-JMP handle_input_remove_old_cursor;      //         remove_old_cursor(oldCursorIndex);
+JMP move_if_new_cursor_still_on_board;   //         move_if_new_cursor_still_on_board(oldCursorIndex);
                                          //         return;
 handle_input_down_is_not_pressed:          //     }
 
@@ -49,10 +39,19 @@ handle_input_down_is_not_pressed:          //     }
 JMP handle_input_return;                 //     return;
                                          // }
 
-                                         // ** R1 = old_square_index
-handle_input_remove_old_cursor:          // void remove_old_cursor(old_square_index) {
+                                         // ** R1 = old_square_index, R3 = new_square_index
+move_if_new_cursor_still_on_board:       // void move_if_new_cursor_still_on_board(old_square_index, new_square_index) {
+LD.B R2,#board;
+ADD R2,R3;
+LD.B R0,(R2);                            //     var squareValue = board[newCursorIndex];
+LD.B R2,#7;
+CMP R0,R2;
+BEQ handle_input_return;                 //     if(squareValue == 7) { return; }
+
+ST.B global_cursor_square_index, R3;     //     global_cursor_square_index = newCursorIndex;
+
 LD.W R0, #handle_input_return;
-JMP draw_piece;                          //     draw_piece(global_cursor_square_index)
+JMP draw_piece;                          //     draw_piece(old_square_index); // clear cursor from old square
                                          //     return;
                                          // }
 handle_input_return:
