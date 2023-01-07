@@ -143,19 +143,20 @@ NOP;
 
 start:
 LD.W R0, #main_return_from_draw_board;
-JMP draw_board;                      //         draw_board()
+JMP draw_board;                          // draw_board()
 main_return_from_draw_board:
 NOP;
 
-infinite_loop:
+infinite_loop:                           // do {
 NOP;
-
 
 LD.B R1, global_displayed_cursor_square;
 LD.W R0, #main_return_from_draw_piece;
-JMP draw_piece;                      //         draw_piece(global_displayed_cursor_square)
+JMP draw_piece;                          //         draw_piece(global_displayed_cursor_square)
 main_return_from_draw_piece:
+NOP;
 
+include "get_input.asm";                 //         var input = get_input();
 
-JMP infinite_loop;
+JMP infinite_loop;                       // } loop
 
