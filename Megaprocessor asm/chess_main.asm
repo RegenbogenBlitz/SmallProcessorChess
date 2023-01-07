@@ -134,23 +134,28 @@ IO_SWITCH_FLAG_RIGHT            EQU     0x0008;
 // *************************************
 // The program....
 
-global_selected_square: DB SQUARE_INDEX_A1;
+global_new_cursor_square: DB SQUARE_INDEX_A1;
+global_displayed_cursor_square: DB SQUARE_INDEX_A1;
 
 NOP;
 NOP;
 NOP;
 
 start:
-LD.W R0, #main_return_from_draw_piece;
+LD.W R0, #main_return_from_draw_board;
 JMP draw_board;                      //         draw_board()
-main_return_from_draw_piece:
+main_return_from_draw_board:
 NOP;
-
 
 infinite_loop:
 NOP;
 
-include "wait_for_input.asm";
+
+LD.B R1, global_displayed_cursor_square;
+LD.W R0, #main_return_from_draw_piece;
+JMP draw_piece;                      //         draw_piece(global_displayed_cursor_square)
+main_return_from_draw_piece:
+
 
 JMP infinite_loop;
 

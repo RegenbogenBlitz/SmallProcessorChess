@@ -211,6 +211,23 @@ DB 0b10100000; // █ █
 DB 0b11000000; //  ██
 DB 0b10000000; //   █
 
+selected_square_sprite:
+               // left
+DB 0b00001111; // ████
+DB 0b00001111; // ████
+DB 0b00001111; // ████
+DB 0b00001111; // ████
+DB 0b00001111; // ████
+DB 0b00001111; // ████
+
+               // right
+DB 0b11110000; // ████
+DB 0b11110000; // ████
+DB 0b11110000; // ████
+DB 0b11110000; // ████
+DB 0b11110000; // ████
+DB 0b11110000; // ████
+
 piece_sprite_addresses:
 DW black_square_sprite;
 DW black_pawn_sprite;
@@ -228,7 +245,6 @@ DW white_bishop_sprite;
 DW white_rook_sprite;
 DW white_queen_sprite;
 
-
 // *************************************
 // Constants
 
@@ -236,6 +252,7 @@ INT_RAM_START EQU 0xA000;
 
 // *************************************
 
+draw_piece_flash_state: DW 0;
 draw_piece_return_address: DW;
 draw_piece_sprite_address: DW;
 NOP;
@@ -277,13 +294,29 @@ JMP draw_piece_square_colour_loop;          //         }
 draw_piece_empty_square_check_end:
 
 
+LD.B R2, global_displayed_cursor_square;    //
+CMP R2,R1;
+BNE draw_piece_select_piece_sprite;         //     if(global_displayed_cursor_square == square_index) {
+LD.W R2, draw_piece_flash_state;
+INC R2;
+ST.W draw_piece_flash_state, R2;            //         draw_piece_flash_state++;
+                                            //         // looking at the 2nd bit gives a flash of half the speed of the 1st bit
+BTST R2,#2;                                 //         draw_piece_flash_bit = 2nd LSB of draw_piece_flash_state;
+BEQ draw_piece_select_piece_sprite;         //         if(draw_piece_flash_bit == 1) {
+LD.W R0, #selected_square_sprite;
+ST.W draw_piece_sprite_address,R0;          //             piece_sprite_address = selected_square_sprite_address;
+JMP draw_piece_sprite_selected;             //         }
+                                            //     }
 
+draw_piece_select_piece_sprite:             //     if(global_displayed_cursor_square != square_index || draw_piece_flash_bit == 0)
 LD.W R2, #piece_sprite_addresses;
 ADD R2,R0;
 ADD R2,R0; // twice because each address is a word
 LD.W R0, (R2);
-ST.W draw_piece_sprite_address,R0;          //     piece_sprite_address = piece_sprite_addresses[piece_value]; 
+ST.W draw_piece_sprite_address,R0;          //         piece_sprite_address = piece_sprite_addresses[piece_value]; 
+                                            //     }
 
+draw_piece_sprite_selected:
 LD.W R2, #INT_RAM_START;                    //     led_byte_address = INT_RAM_START;
 
 LD.B R0, #21;
