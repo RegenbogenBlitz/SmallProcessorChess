@@ -117,9 +117,28 @@ include "draw_board.asm";
 // Constants
 
 SQUARE_INDEX_A8 EQU 21;
+SQUARE_INDEX_A1 EQU 91;
+
+
+// To handle the peripherals:
+PERIPHERALS_BASE                equ     0x8000;
+GEN_IO_BASE                     equ     PERIPHERALS_BASE + 0x30;
+GEN_IO_INPUT                    equ     GEN_IO_BASE + 2;
+
+// (Switches are HIGH by "default", and go LOW on being pressed).
+IO_SWITCH_FLAG_UP               EQU     0x0001;
+IO_SWITCH_FLAG_DOWN             EQU     0x0002;
+IO_SWITCH_FLAG_LEFT             EQU     0x0004;
+IO_SWITCH_FLAG_RIGHT            EQU     0x0008;
 
 // *************************************
 // The program....
+
+global_selected_square: DB SQUARE_INDEX_A1;
+
+NOP;
+NOP;
+NOP;
 
 start:
 LD.W R0, #main_return_from_draw_piece;
@@ -127,6 +146,11 @@ JMP draw_board;                      //         draw_board()
 main_return_from_draw_piece:
 NOP;
 
+
 infinite_loop:
 NOP;
+
+include "wait_for_input.asm";
+
 JMP infinite_loop;
+
