@@ -118,6 +118,7 @@ include "draw_board.asm";
 
 SQUARE_INDEX_A8 EQU 21;
 SQUARE_INDEX_A1 EQU 91;
+SQUARE_INDEX_H1 EQU 98;
 
 // To handle the peripherals:
 PERIPHERALS_BASE                equ     0x8000;
