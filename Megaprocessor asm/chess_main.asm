@@ -128,6 +128,7 @@ GEN_IO_INPUT                    equ     GEN_IO_BASE + 2;
 // The program....
 
 global_cursor_square_index: DB SQUARE_INDEX_A1;
+global_selected_square_index: DB SQUARE_INDEX_A8;
 
 NOP;
 NOP;
@@ -143,9 +144,14 @@ infinite_loop:                           // do {
 NOP;
 
 LD.B R1, global_cursor_square_index;
-LD.W R0, #main_return_from_draw_piece;
+LD.W R0, #main_return_from_draw_piece_for_cursor;
 JMP draw_piece;                          //         draw_piece(global_cursor_square_index)
-main_return_from_draw_piece:
+main_return_from_draw_piece_for_cursor:
+
+LD.B R1, global_selected_square_index;
+LD.W R0, #main_return_from_draw_piece_for_selected_square;
+JMP draw_piece;                          //         draw_piece(global_selected_square_index)
+main_return_from_draw_piece_for_selected_square:
 NOP;
 
 include "get_input.asm";                 //         var input = get_input();
