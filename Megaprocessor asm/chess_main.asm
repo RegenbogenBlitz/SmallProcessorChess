@@ -117,7 +117,7 @@ include "draw_board.asm";
 // Constants
 
 SQUARE_INDEX_A8 EQU 21;
-SQUARE_INDEX_A1 EQU 91;
+SQUARE_INDEX_E1 EQU 95;
 
 // To handle the peripherals:
 PERIPHERALS_BASE                equ     0x8000;
@@ -127,8 +127,8 @@ GEN_IO_INPUT                    equ     GEN_IO_BASE + 2;
 // *************************************
 // The program....
 
-global_cursor_square_index: DB SQUARE_INDEX_A1;
-global_selected_square_index: DB SQUARE_INDEX_A8;
+global_cursor_square_index: DB SQUARE_INDEX_E1;
+global_selected_square_index: DB SQUARE_INDEX_E1;
 
 NOP;
 NOP;
