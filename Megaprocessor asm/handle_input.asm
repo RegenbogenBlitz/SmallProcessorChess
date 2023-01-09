@@ -87,8 +87,12 @@ BEQ handle_input_return;                 //     if(squareValue == 7) { return; }
 
 ST.B global_cursor_square_index, R3;     //     global_cursor_square_index = newCursorIndex;
 
-LD.W R0, #handle_input_return;
+LD.W R0, #handle_input_return_old_cursor;
 JMP draw_piece;                          //     draw_piece(old_square_index); // clear cursor from old square
+handle_input_return_old_cursor:
+LD.B R1,global_cursor_square_index;
+LD.W R0, #handle_input_return;
+JMP draw_piece;                          //     draw_piece(global_cursor_square_index); // clear cursor from old square
                                          //     return;
                                          // }
 handle_input_return:
