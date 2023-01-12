@@ -82,7 +82,8 @@ NOP;
 //  7  7  7  7  7  7  7  7  7  7
 //  7  7  7  7  7  7  7  7  7  7
 
-// 0b000111 offboard
+OFFBOARD_SQUARE_VALUE EQU 0b000111;
+
 // 0b11xxxx not moved 0b00xxxx already moved
 // 0bxx1xxx white     0bxx0xxx black
 // 0bxxx001 pawn

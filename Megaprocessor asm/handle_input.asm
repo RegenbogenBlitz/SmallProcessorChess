@@ -8,13 +8,13 @@ IO_SWITCH_FLAG_CROSS            EQU     0x0080;
                                          // ** R0 = input
                                          // void handle_input(input) {
 TEST R0;
-BEQ handle_input_return;                 //     if(input == 0) { return; }
-                                         //     else {
-                                         //         GEN_IO_INPUT = input;
+BNE handle_input__check_input;           //     if(input == 0) {
+JMP handle_input_return;                 //         return;
                                          //     }
+handle_input__check_input:
 LD.W R1,#IO_SWITCH_FLAG_UP;
 AND R1,R0;
-BNE handle_input_up_is_not_pressed;      //     if(GEN_IO_INPUT & IO_SWITCH_FLAG_UP != 0) {
+BNE handle_input_up_is_not_pressed;      //     if(input & IO_SWITCH_FLAG_UP != 0) {
                                          //     } else {
 LD.B R3,global_cursor_square_index;      //         var newCursorIndex = global_cursor_square_index;
 MOVE R1, R3;                             //         var oldCursorIndex = newCursorIndex;
@@ -26,7 +26,7 @@ handle_input_up_is_not_pressed:          //     }
 
 LD.W R1,#IO_SWITCH_FLAG_DOWN;
 AND R1,R0;
-BNE handle_input_down_is_not_pressed;    //     if(GEN_IO_INPUT & IO_SWITCH_FLAG_DOWN != 0) {
+BNE handle_input_down_is_not_pressed;    //     if(input & IO_SWITCH_FLAG_DOWN != 0) {
                                          //     } else {
 LD.B R3,global_cursor_square_index;      //         var newCursorIndex = global_cursor_square_index;
 MOVE R1, R3;                             //         var oldCursorIndex = newCursorIndex;
@@ -38,7 +38,7 @@ handle_input_down_is_not_pressed:        //     }
 
 LD.W R1,#IO_SWITCH_FLAG_LEFT;
 AND R1,R0;
-BNE handle_input_left_is_not_pressed;    //     if(GEN_IO_INPUT & IO_SWITCH_FLAG_LEFT != 0) {
+BNE handle_input_left_is_not_pressed;    //     if(input & IO_SWITCH_FLAG_LEFT != 0) {
                                          //     } else {
 LD.B R3,global_cursor_square_index;      //         var newCursorIndex = global_cursor_square_index;
 MOVE R1, R3;                             //         var oldCursorIndex = newCursorIndex;
@@ -50,7 +50,7 @@ handle_input_left_is_not_pressed:        //     }
 
 LD.W R1,#IO_SWITCH_FLAG_RIGHT;
 AND R1,R0;
-BNE handle_input_right_is_not_pressed;   //     if(GEN_IO_INPUT & IO_SWITCH_FLAG_RIGHT != 0) {
+BNE handle_input_right_is_not_pressed;   //     if(input & IO_SWITCH_FLAG_RIGHT != 0) {
                                          //     } else {
 LD.B R3,global_cursor_square_index;      //         var newCursorIndex = global_cursor_square_index;
 MOVE R1, R3;                             //         var oldCursorIndex = newCursorIndex;
@@ -62,7 +62,7 @@ handle_input_right_is_not_pressed:       //     }
 
 LD.W R1,#IO_SWITCH_FLAG_CROSS;
 AND R1,R0;
-BNE handle_input_cross_is_not_pressed;   //     if(GEN_IO_INPUT & IO_SWITCH_FLAG_CROSS != 0) {
+BNE handle_input_cross_is_not_pressed;   //     if(input & IO_SWITCH_FLAG_CROSS != 0) {
                                          //     } else {
 LD.B R1,global_selected_square_index;    //         var oldSelectedIndex = global_selected_square_index;
 LD.B R3,global_cursor_square_index;
@@ -81,9 +81,9 @@ move_if_new_cursor_still_on_board:       // void move_if_new_cursor_still_on_boa
 LD.B R2,#board;
 ADD R2,R3;
 LD.B R0,(R2);                            //     var squareValue = board[newCursorIndex];
-LD.B R2,#7;
+LD.B R2,#OFFBOARD_SQUARE_VALUE;
 CMP R0,R2;
-BEQ handle_input_return;                 //     if(squareValue == 7) { return; }
+BEQ handle_input_return;                 //     if(squareValue == OFFBOARD_SQUARE_VALUE) { return; }
 
 ST.B global_cursor_square_index, R3;     //     global_cursor_square_index = newCursorIndex;
 
