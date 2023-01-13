@@ -142,22 +142,31 @@ NOP;
 
 start:
 LD.W R0, #main_return_from_draw_board;
-JMP draw_board;                          // draw_board()
+JMP draw_board;                              // draw_board()
 main_return_from_draw_board:
 NOP;
 
-infinite_loop:                           // do {
+infinite_loop:                               // do {
 NOP;
+
+LD.W R2, draw_piece_selected_flash_state;
+INV R2;
+ST.W draw_piece_selected_flash_state, R2;    //     draw_piece_selected_flash_state~~;
+
+LD.B R1, global_cursor_square_index;
+LD.W R0, #main_return_from_draw_piece_for_cursor_square;
+JMP draw_piece;                              //     draw_piece(global_cursor_square_index)
+main_return_from_draw_piece_for_cursor_square:
 
 LD.B R1, global_selected_square_index;
 LD.W R0, #main_return_from_draw_piece_for_selected_square;
-JMP draw_piece;                          //         draw_piece(global_selected_square_index)
+JMP draw_piece;                              //     draw_piece(global_selected_square_index)
 main_return_from_draw_piece_for_selected_square:
 NOP;
 
-include "get_input.asm";                 //         var input = get_input();
+include "get_input.asm";                     //     var input = get_input();
 
 include "handle_input.asm";
 
-JMP infinite_loop;                       // } loop
+JMP infinite_loop;                           // } loop
 

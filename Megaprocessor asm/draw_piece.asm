@@ -297,10 +297,6 @@ LD.B R2, global_selected_square_index;
 CMP R2,R1;
 BNE draw_piece_square_not_selected;         //     if(global_selected_square_index == square_index) {
 LD.W R2, draw_piece_selected_flash_state;
-INC R2;
-ST.W draw_piece_selected_flash_state, R2;   //         draw_piece_selected_flash_state++;
-                                            //         // looking at the 2nd bit gives a flash of half the speed of the 1st bit
-BTST R2,#2;                                 //         draw_piece_selected_flash_bit = 2nd LSB of draw_piece_selected_flash_state;
 BEQ draw_piece_show_square_content_sprite;  //         if(draw_piece_selected_flash_bit == 1) {
 LD.W R0, #selected_square_sprite;
 ST.W draw_piece_sprite_address,R0;          //             piece_sprite_address = selected_square_sprite_address;
@@ -310,9 +306,11 @@ draw_piece_square_not_selected:             //     }
 LD.B R2, global_cursor_square_index;
 CMP R2,R1;
 BNE draw_piece_show_square_content_sprite;  //     if(global_cursor_square_index == square_index) {
+LD.W R2, draw_piece_selected_flash_state;
+BEQ draw_piece_show_square_content_sprite;  //         if(draw_piece_selected_flash_bit == 1) {
 LD.W R0, #selected_square_sprite;
-ST.W draw_piece_sprite_address,R0;          //         piece_sprite_address = selected_square_sprite_address;
-JMP draw_piece_sprite_selected;
+ST.W draw_piece_sprite_address,R0;          //             piece_sprite_address = selected_square_sprite_address;
+JMP draw_piece_sprite_selected;             //         }
                                             //     }
 
 draw_piece_show_square_content_sprite:      //     if(
