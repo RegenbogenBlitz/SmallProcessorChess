@@ -75,11 +75,11 @@ LD.B R2, #board;
 ADD R2,R1;
 LD.B R1, (R2);                           //         var old_square_value = board[global_selected_square_index];
 
-BEQ handle_input__change_selection;      //         if(old_square_value == EMPTY_SQUARE_VALUE) {
+BEQ handle_input__change_selection;      //         if(old_square_value == PIECE_ENUM_EMPTY) {
                                          //             goto change_selection;
                                          //         }
 TEST R0;
-BEQ handle_input__move_piece;            //         if(new_square_value == EMPTY_SQUARE_VALUE) {
+BEQ handle_input__move_piece;            //         if(new_square_value == PIECE_ENUM_EMPTY) {
                                          //             goto handle_input__move_piece;
                                          //         }
 
@@ -109,8 +109,8 @@ ADD R2,R1;
 LD.B R0, (R2);
 
 ST.B (R3), R0;                           //         board[global_cursor_square_index] = board[global_selected_square_index];
-LD.B R0, #EMPTY_SQUARE_VALUE;
-ST.B (R2), R0;                           //         board[global_selected_square_index] = EMPTY_SQUARE_VALUE;
+LD.B R0, #PIECE_ENUM_EMPTY;
+ST.B (R2), R0;                           //         board[global_selected_square_index] = PIECE_ENUM_EMPTY;
 
 handle_input__update_old_square:         //         update_old_square:
 LD.W R0, #handle_input_return;
@@ -127,9 +127,9 @@ move_if_new_cursor_still_on_board:       // void move_if_new_cursor_still_on_boa
 LD.B R2,#board;
 ADD R2,R3;
 LD.B R0,(R2);                            //     var squareValue = board[newCursorIndex];
-LD.B R2,#OFFBOARD_SQUARE_VALUE;
+LD.B R2,#PIECE_ENUM_OFFBOARD;
 CMP R0,R2;
-BEQ handle_input_return;                 //     if(squareValue == OFFBOARD_SQUARE_VALUE) { return; }
+BEQ handle_input_return;                 //     if(squareValue == PIECE_ENUM_OFFBOARD) { return; }
 
 ST.B global_cursor_square_index, R3;     //     global_cursor_square_index = newCursorIndex;
 
