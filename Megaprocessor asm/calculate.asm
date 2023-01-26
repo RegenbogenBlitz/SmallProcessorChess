@@ -1,54 +1,142 @@
+PIECE_COLOUR_MASK   EQU 0b00001000;
+PIECE_COLOUR_WHITE  EQU 0b00001000;
+PIECE_COLOUR_BLACK  EQU 0b00000000;
+
+// 0b11xxxx not moved 0b00xxxx already moved
+
+EMPTY_SQUARE_VALUE EQU 0b00000000;
+OFFBOARD_SQUARE_VALUE EQU 0b000111;
+
+PIECE_ENUM_EMPTY    EQU 0b00000000;
+PIECE_ENUM_PAWN     EQU 0b00000001;
+PIECE_ENUM_KING     EQU 0b00000010;
+// 0bxxx011 knight
+// 0bxxx100 bishop
+// 0bxxx101 rook
+PIECE_ENUM_QUEEN    EQU 0b00000110;
+PIECE_ENUM_OFFBOARD EQU 0b00000111;
+
+PIECE_ENUM_WHITE_PAWN EQU PIECE_COLOUR_WHITE + PIECE_ENUM_PAWN;
+
+PIECE_GAMEVALUE_EMPTY EQU 0;
+PIECE_GAMEVALUE_PAWN EQU 14;
+PIECE_GAMEVALUE_KING EQU 0;
+PIECE_GAMEVALUE_KNIGHT EQU 40;
+PIECE_GAMEVALUE_BISHOP EQU 38;
+PIECE_GAMEVALUE_ROOK EQU 68;
+PIECE_GAMEVALUE_QUEEN EQU 124;
+
+calculate_piece_game_values:
+DB PIECE_GAMEVALUE_EMPTY;
+DB PIECE_GAMEVALUE_PAWN;
+DB PIECE_GAMEVALUE_KING;
+DB PIECE_GAMEVALUE_KNIGHT;
+DB PIECE_GAMEVALUE_BISHOP;
+DB PIECE_GAMEVALUE_ROOK;
+DB PIECE_GAMEVALUE_QUEEN;
+
+calculate_rook_move_directions:
+DB -1, 1, -10, 10;                   // rook move directions (& king, queen)
+calculate_bishop_move_directions:
+DB -11, -9, 9, 11;                   // bishop move directions (& king, queen)
+calculate_blackpawn_move_directions:
+DB 9, 11, 10, 20;
+calculate_whitepawn_move_directions:
+DB -11, -9, -10, -20;
+calculate_knight_move_directions:
+DB -21, -19, -12, -8, 8, 12, 19, 21;
+
+calculate_initial_move_direction_indexes:
+DW 0;
+DW calculate_blackpawn_move_directions;
+DW calculate_rook_move_directions; // start of kings moves
+DW calculate_knight_move_directions;
+DW calculate_bishop_move_directions;
+DW calculate_rook_move_directions;
+DW calculate_rook_move_directions; // start of queen moves
+DW 0; // 7
+
+DW 0; // 8
+DW calculate_whitepawn_move_directions;
+DW calculate_rook_move_directions; // start of kings moves
+DW calculate_knight_move_directions;
+DW calculate_bishop_move_directions;
+DW calculate_rook_move_directions;
+DW calculate_rook_move_directions; // start of queen moves
+
+// Board representation
+
+//  xxxxxxxxxx
+//  xxxxxxxxxx
+//  xRHBQKBHRx
+//  xPPPPPPPPx
+//  x........x
+//  x........x
+//  xppppppppx
+//  xrhbqkbhrx
+//  xxxxxxxxxx
+//  xxxxxxxxxx
+
+// Coordinates
+//  x  x  x  x  x  x  x  x  x  x
+//  x  x  x  x  x  x  x  x  x  x
+//  x 21 22 23 24 25 26 27 28  x
+//  x 31 32 33 34 35 36 37 38  x
+//  x 41 42 43 44 45 46 47 48  x
+//  x 51 52 53 54 55 56 57 58  x
+//  x 61 62 63 64 65 66 67 68  x
+//  x 71 72 73 74 75 76 77 78  x
+//  x 81 82 83 84 85 86 87 88  x
+//  x 91 92 93 94 95 96 97 98  x
+//  x  x  x  x  x  x  x  x  x  x
+//  x  x  x  x  x  x  x  x  x  x
+
+// Main Representation
+//  7  7  7  7  7  7  7  7  7  7
+//  7  7  7  7  7  7  7  7  7  7
+//  7  5  3  4  6  2  4  3  5  7
+//  7  1  1  1  1  1  1  1  1  7
+//  7  0  0  0  0  0  0  0  0  7
+//  7  0  0  0  0  0  0  0  0  7
+//  7  0  0  0  0  0  0  0  0  7
+//  7  0  0  0  0  0  0  0  0  7
+//  7  9  9  9  9  9  9  9  9  7
+//  7 13 11 12 14 10 12 11 13  7
+//  7  7  7  7  7  7  7  7  7  7
+//  7  7  7  7  7  7  7  7  7  7
+
+// Initial Representation
+//  7  7  7  7  7  7  7  7  7  7
+//  7  7  7  7  7  7  7  7  7  7
+//  7 53 51 52 54 50 52 51 53  7
+//  7 49 49 49 49 49 49 49 49  7
+//  7  0  0  0  0  0  0  0  0  7
+//  7  0  0  0  0  0  0  0  0  7
+//  7  0  0  0  0  0  0  0  0  7
+//  7  0  0  0  0  0  0  0  0  7
+//  7 57 57 57 57 57 57 57 57  7
+//  7 61 59 60 62 58 60 59 61  7
+//  7  7  7  7  7  7  7  7  7  7
+//  7  7  7  7  7  7  7  7  7  7
+
+board:
+DB 0b000111, 0b000111, 0b000111, 0b000111, 0b000111, 0b000111, 0b000111, 0b000111, 0b000111, 0b000111; // 0-9
+DB 0b000111, 0b000111, 0b000111, 0b000111, 0b000111, 0b000111, 0b000111, 0b000111, 0b000111, 0b000111; // 10-19
+DB 0b000111, 0b110101, 0b110011, 0b110100, 0b110110, 0b110010, 0b110100, 0b110011, 0b110101, 0b000111; // 20-29  rank 8
+DB 0b000111, 0b110001, 0b110001, 0b110001, 0b110001, 0b110001, 0b110001, 0b110001, 0b110001, 0b000111; // 30-39  rank 7
+DB 0b000111, 0b000000, 0b000000, 0b000000, 0b000000, 0b000000, 0b000000, 0b000000, 0b000000, 0b000111; // 40-49  rank 6
+DB 0b000111, 0b000000, 0b000000, 0b000000, 0b000000, 0b000000, 0b000000, 0b000000, 0b000000, 0b000111; // 50-59  rank 5
+DB 0b000111, 0b000000, 0b000000, 0b000000, 0b000000, 0b000000, 0b000000, 0b000000, 0b000000, 0b000111; // 60-69  rank 4
+DB 0b000111, 0b000000, 0b000000, 0b000000, 0b000000, 0b000000, 0b000000, 0b000000, 0b000000, 0b000111; // 70-79  rank 3
+DB 0b000111, 0b111001, 0b111001, 0b111001, 0b111001, 0b111001, 0b111001, 0b111001, 0b111001, 0b000111; // 80-89  rank 2
+DB 0b000111, 0b111101, 0b111011, 0b111100, 0b111110, 0b111010, 0b111100, 0b111011, 0b111101, 0b000111; // 90-99  rank 1
+DB 0b000111, 0b000111, 0b000111, 0b000111, 0b000111, 0b000111, 0b000111, 0b000111, 0b000111, 0b000111; // 100-109
+DB 0b000111, 0b000111, 0b000111, 0b000111, 0b000111, 0b000111, 0b000111, 0b000111, 0b000111, 0b000111; // 110-119
+
 // let highlightedSquareIndex = 0;
 // let newEnPassantPawnIndex = 0;
 // let clickedBoardIndex = 0;
-// 
-// const blackColor = 0b0000;
-// const whiteColor = 0b1000;
-// 
-// const whitePawnPieceValue = 0b1001;
-// const pawnPieceValue = 0b0001; // 1
-// const kingPieceValue = 0b0010; // 2
-// const queenPieceValue = 0b0110; // 6
-// const offBoardValue = 0b0111; // 7
-// 
-// const pawnGameValue = 14;
-// const queenGameValue = 124;
-// 
-// const pieceGameValues = [
-//     0, pawnGameValue, 0, 40, 38, 68, queenGameValue  //  0- 6: piece game value: empty 0, pawn: 14, king: 0, knight: 40, bishop: 38, rook: 68, queen: 124
-// ];
-// 
-// const moveDirections = [
-//     -1, 1, -10, 10,                                  //  0- 3: rook move directions (& king, queen)
-//     -11, -9, 9, 11, 10, 20,                          //  4- 7: bishop move directions (& king, queen), 6-9: black pawn move directions
-//     -11, -9, -10, -20,                               // 10-13: white pawn move directions
-//     -21, -19, -12, -8, 8, 12, 19, 21,                // 14-21: knight move directions
-// ];
-// 
-// const initialMoveDirectionIndexes = [
-//     6, 0, 14, 4, 0, 0                                //  0- 5: initial move index: black pawn, king, knight, bishop, rook, queen
-// ];
-// 
-// const unicodeOffsets = [
-//     15, 10, 14, 13, 12, 11, -32, -32,                //  0- 7: 9808 + value = unicode black chess piece:       pawn, king, knight, bishop, rook, queen, n/a, n/a
-//     9, 4, 8, 7, 6, 5                                 //  8-13: 9808 + value = unicode white chess piece:       pawn, king, knight, bishop, rook, queen
-// ];
-// 
-// const boardState = [
-//     7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
-//     7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
-//     7, 53, 51, 52, 54, 50, 52, 51, 53, 7,
-//     7, 49, 49, 49, 49, 49, 49, 49, 49, 7,
-//     7, 0, 0, 0, 0, 0, 0, 0, 0, 7,
-//     7, 0, 0, 0, 0, 0, 0, 0, 0, 7,
-//     7, 0, 0, 0, 0, 0, 0, 0, 0, 7,
-//     7, 0, 0, 0, 0, 0, 0, 0, 0, 7,
-//     7, 57, 57, 57, 57, 57, 57, 57, 57, 7,
-//     7, 61, 59, 60, 62, 58, 60, 59, 61, 7,
-//     7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
-//     7, 7, 7, 7, 7, 7, 7, 7, 7, 7
-// ];
-// 
+
 // const calculate = (opponentPieceColor, depth, enPassantPawnIndex, modeMaxDepth, maxGameValueThatAvoidsPruning) => {
 //     let originPieceColor = opponentPieceColor ^ 0b1000;
 //     let bestGameValue = -100000000;
@@ -156,7 +244,9 @@
 //                                 return;
 //                             }
 // 
-//                             castlingIsProhibited = !originPieceIsAKing || moveDirectionNumber < 7 || otherSquareOriginIndex > 0 || modeMaxDepth === 0 || !targetIsEmpty || !originPieceIsOnOriginalSquare || calculate(originPieceColor, 0, undefined, 0) > 10000;
+//                             castlingIsProhibited = 
+//                                 !originPieceIsAKing || moveDirectionNumber < 7 || otherSquareOriginIndex > 0 ||
+//                                 modeMaxDepth === 0 || !targetIsEmpty || !originPieceIsOnOriginalSquare || calculate(originPieceColor, 0, undefined, 0) > 10000;
 // 
 //                             // restore board
 //                             boardState[originSquareIndex] = originSquareValue;
