@@ -301,14 +301,21 @@ DB 0;
 //     const positionGameValue = returnValueCondition ? bestGameValue : 0;
 //     return positionGameValue;
 // }
-// 
-// const onClick = (eventBoardIndex) => {
-//     calculate_clickedBoardIndex = eventBoardIndex;
-//     const boardValueIsWhitePiece = (boardState[calculate_clickedBoardIndex] & whiteColor) !== 0;
-//     if (boardValueIsWhitePiece) {
-//         global_selected_square_index = calculate_clickedBoardIndex;
-//         renderHtml();
-//     } else {
-//         calculate(blackColor, 0, calculate_newEnPassantPawnIndex, 1);
-//     }
-// }
+
+calculate_on_click_return_address: DW;
+
+calculate__on_click:                         // const onClick = () => {
+ST.W calculate_on_click_return_address, R0;
+
+LD.W R0, global_cursor_square_index;
+ST.W calculate_clickedBoardIndex, R0;        //     calculate_clickedBoardIndex = global_cursor_square_index;
+                                             //     const boardValueIsWhitePiece = (boardState[calculate_clickedBoardIndex] & whiteColor) !== 0;
+                                             //     if (boardValueIsWhitePiece) {
+                                             //         global_selected_square_index = calculate_clickedBoardIndex;
+                                             //         renderHtml();
+                                             //     } else {
+                                             //         calculate(blackColor, 0, calculate_newEnPassantPawnIndex, 1);
+                                             //     }
+LD.W R0, draw_board_return_address;
+JMP (R0);                                    //     return;
+                                             // };
