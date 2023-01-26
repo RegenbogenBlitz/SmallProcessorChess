@@ -116,9 +116,10 @@ DB PIECE_ENUM_OFFBOARD, UNMOVED_WHITE_ROOK,  UNMOVED_WHITE_KNIGHT, UNMOVED_WHITE
 DB PIECE_ENUM_OFFBOARD, PIECE_ENUM_OFFBOARD, PIECE_ENUM_OFFBOARD,  PIECE_ENUM_OFFBOARD,  PIECE_ENUM_OFFBOARD, PIECE_ENUM_OFFBOARD, PIECE_ENUM_OFFBOARD,  PIECE_ENUM_OFFBOARD,  PIECE_ENUM_OFFBOARD, PIECE_ENUM_OFFBOARD; // 100-109
 DB PIECE_ENUM_OFFBOARD, PIECE_ENUM_OFFBOARD, PIECE_ENUM_OFFBOARD,  PIECE_ENUM_OFFBOARD,  PIECE_ENUM_OFFBOARD, PIECE_ENUM_OFFBOARD, PIECE_ENUM_OFFBOARD,  PIECE_ENUM_OFFBOARD,  PIECE_ENUM_OFFBOARD, PIECE_ENUM_OFFBOARD; // 110-119
 
-// let highlightedSquareIndex = 0;
-// let newEnPassantPawnIndex = 0;
-// let clickedBoardIndex = 0;
+calculate_calculate_newEnPassantPawnIndex:
+DB 0;
+calculate_clickedBoardIndex:
+DB 0;
 
 // const calculate = (opponentPieceColor, depth, enPassantPawnIndex, modeMaxDepth, maxGameValueThatAvoidsPruning) => {
 //     let originPieceColor = opponentPieceColor ^ 0b1000;
@@ -214,14 +215,14 @@ DB PIECE_ENUM_OFFBOARD, PIECE_ENUM_OFFBOARD, PIECE_ENUM_OFFBOARD,  PIECE_ENUM_OF
 //                             const opponentMoveGameValue = calculate(originPieceColor, depth + 1, justMovedEnPassantPawnIndex, modeMaxDepth, maxOpponentGameValueThatAvoidsPruning);
 //                             const correctedMoveGameValue = moveGameValue - opponentMoveGameValue;
 //                             moveGameValue = correctedMoveGameValue;
-//                             if (depth === 0 && modeMaxDepth === 1 && highlightedSquareIndex === originSquareIndex && targetSquareIndex === clickedBoardIndex && moveGameValue >= -10000) {
-//                                 newEnPassantPawnIndex = justMovedEnPassantPawnIndex;
-//                                 highlightedSquareIndex = clickedBoardIndex;
+//                             if (depth === 0 && modeMaxDepth === 1 && global_selected_square_index === originSquareIndex && targetSquareIndex === calculate_clickedBoardIndex && moveGameValue >= -10000) {
+//                                 calculate_newEnPassantPawnIndex = justMovedEnPassantPawnIndex;
+//                                 global_selected_square_index = calculate_clickedBoardIndex;
 //                                 renderHtml();
 //                                 if (originPieceColor == whiteColor) {
 //                                     setTimeout(() => {
-//                                         calculate(whiteColor, 0, newEnPassantPawnIndex, 2);
-//                                         calculate(whiteColor, 0, newEnPassantPawnIndex, 1);
+//                                         calculate(whiteColor, 0, calculate_newEnPassantPawnIndex, 2);
+//                                         calculate(whiteColor, 0, calculate_newEnPassantPawnIndex, 1);
 //                                     }, 75);
 //                                 }
 //                                 return;
@@ -257,8 +258,8 @@ DB PIECE_ENUM_OFFBOARD, PIECE_ENUM_OFFBOARD, PIECE_ENUM_OFFBOARD,  PIECE_ENUM_OF
 //                                     }
 //                                 }
 //                                 else {
-//                                     highlightedSquareIndex = originSquareIndex;
-//                                     clickedBoardIndex = targetSquareIndex;
+//                                     global_selected_square_index = originSquareIndex;
+//                                     calculate_clickedBoardIndex = targetSquareIndex;
 //                                 }
 //                             }
 //                         }
@@ -302,12 +303,12 @@ DB PIECE_ENUM_OFFBOARD, PIECE_ENUM_OFFBOARD, PIECE_ENUM_OFFBOARD,  PIECE_ENUM_OF
 // }
 // 
 // const onClick = (eventBoardIndex) => {
-//     clickedBoardIndex = eventBoardIndex;
-//     const boardValueIsWhitePiece = (boardState[clickedBoardIndex] & whiteColor) !== 0;
+//     calculate_clickedBoardIndex = eventBoardIndex;
+//     const boardValueIsWhitePiece = (boardState[calculate_clickedBoardIndex] & whiteColor) !== 0;
 //     if (boardValueIsWhitePiece) {
-//         highlightedSquareIndex = clickedBoardIndex;
+//         global_selected_square_index = calculate_clickedBoardIndex;
 //         renderHtml();
 //     } else {
-//         calculate(blackColor, 0, newEnPassantPawnIndex, 1);
+//         calculate(blackColor, 0, calculate_newEnPassantPawnIndex, 1);
 //     }
 // }
