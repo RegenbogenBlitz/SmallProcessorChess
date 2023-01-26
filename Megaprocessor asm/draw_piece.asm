@@ -264,9 +264,9 @@ draw_piece:
                                             // {
 ST.W draw_piece_return_address, R0;
 
-LD.B R2, #board;
+LD.B R2, #boardState;
 ADD R2,R1;
-LD.B R0, (R2);                              //     board_value = board[square_index]; 
+LD.B R0, (R2);                              //     board_value = boardState[square_index]; 
 
 LD.B R3, #0b00001111;
 AND R0, R3;                                 //     piece_value = board_value & 0b00001111;

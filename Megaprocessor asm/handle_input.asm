@@ -77,9 +77,9 @@ JMP handle_input_return;                 //     return;
 
                                          // ** R1 = old_square_index, R3 = new_square_index
 move_if_new_cursor_still_on_board:       // void move_if_new_cursor_still_on_board(old_square_index, new_square_index) {
-LD.B R2,#board;
+LD.B R2,#boardState;
 ADD R2,R3;
-LD.B R0,(R2);                            //     var squareValue = board[newCursorIndex];
+LD.B R0,(R2);                            //     var squareValue = boardState[newCursorIndex];
 LD.B R2,#PIECE_ENUM_OFFBOARD;
 CMP R0,R2;
 BEQ handle_input_return;                 //     if(squareValue == PIECE_ENUM_OFFBOARD) { return; }
