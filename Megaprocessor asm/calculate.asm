@@ -116,12 +116,17 @@ DB PIECE_ENUM_OFFBOARD, UNMOVED_WHITE_ROOK,  UNMOVED_WHITE_KNIGHT, UNMOVED_WHITE
 DB PIECE_ENUM_OFFBOARD, PIECE_ENUM_OFFBOARD, PIECE_ENUM_OFFBOARD,  PIECE_ENUM_OFFBOARD,  PIECE_ENUM_OFFBOARD, PIECE_ENUM_OFFBOARD, PIECE_ENUM_OFFBOARD,  PIECE_ENUM_OFFBOARD,  PIECE_ENUM_OFFBOARD, PIECE_ENUM_OFFBOARD; // 100-109
 DB PIECE_ENUM_OFFBOARD, PIECE_ENUM_OFFBOARD, PIECE_ENUM_OFFBOARD,  PIECE_ENUM_OFFBOARD,  PIECE_ENUM_OFFBOARD, PIECE_ENUM_OFFBOARD, PIECE_ENUM_OFFBOARD,  PIECE_ENUM_OFFBOARD,  PIECE_ENUM_OFFBOARD, PIECE_ENUM_OFFBOARD; // 110-119
 
-calculate_calculate_newEnPassantPawnIndex:
+calculate_newEnPassantPawnIndex:
 DB 0;
 calculate_clickedBoardIndex:
 DB 0;
 
-// const calculate = (opponentPieceColor, depth, enPassantPawnIndex, modeMaxDepth, maxGameValueThatAvoidsPruning) => {
+MODE0_CHECK_FOR_CHECK EQU 0;
+MODE1_CHECK_CAN_MOVE  EQU 1;
+MODE2_CALCULATE_MOVE  EQU 2;
+
+// MUST BE CALLED USING JSR and the stack
+calculate:                                   // const calculate = (opponentPieceColor, depth, enPassantPawnIndex, modeMaxDepth, maxGameValueThatAvoidsPruning) => {
 //     let originPieceColor = opponentPieceColor ^ 0b1000;
 //     let bestGameValue = -100000000;
 //     let originPlayerIsInCheck = modeMaxDepth > 0 && calculate(originPieceColor, 0, undefined, 0) > 10000;
@@ -296,16 +301,17 @@ DB 0;
 // 
 //         }
 //     }
-// 
-//     const returnValueCondition = (bestGameValue > 768 - winGameValue) || originPlayerIsInCheck;
-//     const positionGameValue = returnValueCondition ? bestGameValue : 0;
-//     return positionGameValue;
-// }
+                                             //
+                                             //     const returnValueCondition = (bestGameValue > 768 - winGameValue) || originPlayerIsInCheck;
+                                             //     const positionGameValue = returnValueCondition ? bestGameValue : 0;
+                                             //     return positionGameValue;
+RET;                                         //
+                                             // }
 
-calculate_on_click_return_address: DW;
+on_click_return_address: DW;
 
 on_click:                                    // const on_click = () => {
-ST.W calculate_on_click_return_address, R0;  //
+ST.W on_click_return_address, R0;            //
                                              //
 LD.B R0, global_cursor_square_index;         //
 ST.B calculate_clickedBoardIndex, R0;        //     calculate_clickedBoardIndex = global_cursor_square_index;
@@ -324,9 +330,25 @@ LD.W R0, #on_click__return;                  //         // TODO improve performa
 JMP draw_board;                              //         draw_board();
                                              //
 on_click__clickedIsOtherValue:               //     } else {
-NOP; // TODO                                 //         calculate(blackColor, 0, calculate_newEnPassantPawnIndex, 1);
+                                             //
+LD.W R0, #0x7FFF;                            //
+MOVE SP, R0;                                 //         // reset SP
+LD.W R0, #0;                                 //
+PUSH R0;                                     //         // push space for result
+LD.B R0, #PIECE_COLOUR_BLACK;                //
+PUSH R0;                                     //         // push opponentPieceColor
+LD.B R0, #0;                                 //
+PUSH R0;                                     //         // push depth
+LD.B R0, calculate_newEnPassantPawnIndex;    //
+PUSH R0;                                     //         // push enPassantPawnIndex
+LD.B R0, #MODE1_CHECK_CAN_MOVE;              //
+PUSH R0;                                     //         // push modeMaxDepth
+LD.W R0, #0;                                 //
+PUSH R0;                                     //         // push maxGameValueThatAvoidsPruning
+                                             //
+JSR calculate;                               //         calculate(PIECE_COLOUR_BLACK, 0, calculate_newEnPassantPawnIndex, MODE1_CHECK_CAN_MOVE, 0);
                                              //     }
 on_click__return:                            //
-LD.W R0, calculate_on_click_return_address;  //
+LD.W R0, on_click_return_address;            //
 JMP (R0);                                    //     return;
                                              // };
