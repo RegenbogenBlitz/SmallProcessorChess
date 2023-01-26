@@ -66,7 +66,7 @@ BNE handle_input_cross_is_not_pressed;   //     if(input & IO_SWITCH_FLAG_CROSS 
                                          //     } else {
 
 LD.W R0, #handle_input__return_from_on_click;
-JMP calculate__on_click;                 //         on_click();
+JMP on_click;                            //         on_click();
 handle_input__return_from_on_click:
 NOP;
 

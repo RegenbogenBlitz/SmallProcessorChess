@@ -304,18 +304,29 @@ DB 0;
 
 calculate_on_click_return_address: DW;
 
-calculate__on_click:                         // const onClick = () => {
-ST.W calculate_on_click_return_address, R0;
-
-LD.W R0, global_cursor_square_index;
-ST.W calculate_clickedBoardIndex, R0;        //     calculate_clickedBoardIndex = global_cursor_square_index;
-                                             //     const boardValueIsWhitePiece = (boardState[calculate_clickedBoardIndex] & whiteColor) !== 0;
-                                             //     if (boardValueIsWhitePiece) {
-                                             //         global_selected_square_index = calculate_clickedBoardIndex;
-                                             //         renderHtml();
-                                             //     } else {
-                                             //         calculate(blackColor, 0, calculate_newEnPassantPawnIndex, 1);
+on_click:                                    // const on_click = () => {
+ST.W calculate_on_click_return_address, R0;  //
+                                             //
+LD.B R0, global_cursor_square_index;         //
+ST.B calculate_clickedBoardIndex, R0;        //     calculate_clickedBoardIndex = global_cursor_square_index;
+                                             //
+LD.B R2, #boardState;                        //
+ADD R2,R0;                                   //
+LD.B R1, (R2);                               //     const clickedBoardState = boardState[calculate_clickedBoardIndex];
+LD.B R3, #PIECE_COLOUR_WHITE;                //
+AND R3,R1;                                   //     const clickedIsWhitePiece = (clickedBoardState & whiteColor) !== 0;
+BNE on_click__clickedIsWhitePiece;           //     if (boardValueIsWhitePiece) {
+JMP on_click__clickedIsOtherValue;           //
+on_click__clickedIsWhitePiece:               //
+ST.B global_selected_square_index, R0;       //         global_selected_square_index = calculate_clickedBoardIndex;
+                                             //
+LD.W R0, #on_click__return;                  //         // TODO improve performance by refreshing just the relevant squares
+JMP draw_board;                              //         draw_board();
+                                             //
+on_click__clickedIsOtherValue:               //     } else {
+NOP; // TODO                                 //         calculate(blackColor, 0, calculate_newEnPassantPawnIndex, 1);
                                              //     }
-LD.W R0, draw_board_return_address;
+on_click__return:                            //
+LD.W R0, calculate_on_click_return_address;  //
 JMP (R0);                                    //     return;
                                              // };
