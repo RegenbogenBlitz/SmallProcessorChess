@@ -163,11 +163,13 @@ ST.B (SP + CALCULATE_LOCAL_originPieceColor), R1;    //     originPieceColor = o
 LD.B R0, #-32768;
 ST.B (SP + CALCULATE_LOCAL_bestGameValue), R1;       //     bestGameValue = -32768;
 
+LD.B R0, #0;
+ST.B (SP + CALCULATE_LOCAL_originPlayerIsInCheck), R0;
 LD.B R0, (SP + CALCULATE_ARG_modeMaxDepth);
 BNE calculate_originPlayerIsInCheck_notModeZero;     //     if(modeMaxDepth == 0) {
 // TODO TODO TODO TODO TODO                          //         originPlayerIsInCheck = calculate(originPieceColor, 0, undefined, 0) > 10000;
 calculate_originPlayerIsInCheck_notModeZero:         //     } else {
-                                                     //         originPlayerIsInCheck = 0;
+                                                     //         originPlayerIsInCheck = false;
                                                      //     }
 
 LD.B R1, #32767;                                     //     winGameValue = 32767;
