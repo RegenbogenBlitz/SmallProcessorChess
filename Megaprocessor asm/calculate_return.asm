@@ -1,4 +1,5 @@
 POP R0; // POP CALCULATE_LOCAL_originPieceColor
 POP R0; // POP CALCULATE_LOCAL_bestGameValue
 POP R0; // POP CALCULATE_LOCAL_originPlayerIsInCheck
+POP R0; // POP CALCULATE_LOCAL_winGameValue
 RET;

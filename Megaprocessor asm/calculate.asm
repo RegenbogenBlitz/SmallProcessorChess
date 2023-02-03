@@ -128,7 +128,8 @@ MODE1_CHECK_CAN_MOVE  EQU 1;
 MODE2_CALCULATE_MOVE  EQU 2;
 
 CALCULATE_LOCAL EQU 0;
-CALCULATE_LOCAL_originPlayerIsInCheck EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_winGameValue EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_originPlayerIsInCheck EQU CALCULATE_LOCAL_winGameValue + 2;
 CALCULATE_LOCAL_bestGameValue EQU CALCULATE_LOCAL_originPlayerIsInCheck + 2;
 CALCULATE_LOCAL_originPieceColor EQU CALCULATE_LOCAL_bestGameValue + 2;
 
@@ -150,6 +151,8 @@ LD.B R0, #-32768;
 PUSH R0;                                             //     dim bestGameValue = -32768;
 LD.B R0, #0;
 PUSH R0;                                             //     dim originPlayerIsInCheck;
+LD.B R0, #0;
+PUSH R0;                                             //     dim winGameValue;
 
 LD.B R0, (SP + CALCULATE_ARG_opponentPieceColor);
 LD.B R1, #0b1000;
@@ -157,14 +160,29 @@ XOR R1, R0;
 ST.B (SP + CALCULATE_LOCAL_originPieceColor), R1;    //     originPieceColor = opponentPieceColor ^ 0b1000;
 
 LD.B R0, (SP + CALCULATE_ARG_modeMaxDepth);
-BNE calculate__notModeZero;                          //     if(modeMaxDepth == 0) {
+BNE calculate_originPlayerIsInCheck_notModeZero;     //     if(modeMaxDepth == 0) {
 // TODO TODO TODO TODO TODO                          //         originPlayerIsInCheck = calculate(originPieceColor, 0, undefined, 0) > 10000;
-                                                     //     }
-calculate__notModeZero:                              //     else {
+calculate_originPlayerIsInCheck_notModeZero:         //     } else {
                                                      //         originPlayerIsInCheck = 0;
                                                      //     }
 
-//     const winGameValue = 32767 - depth * 512; // depth: 0=>32767, 1=>32255, 2=>31743
+LD.B R1, #32767;                                     //     winGameValue = 32767;
+LD.B R0, (SP + CALCULATE_ARG_depth);
+BEQ calculate_winGameValue_depthZero;                //     if(depth != 0) {
+LD.B R3, #-512;
+LD.B R2, #1;
+CMP R0, R2;
+BEQ calculate_winGameValue_depthOne;                 //         if(depth != 1) {
+
+ADD R1, R3;                                          //             winGameValue -= 512 * 2;  // depth=2 => winGameValue = 31743
+calculate_winGameValue_depthOne:                     //         } else {
+ADD R1, R3;                                          //             winGameValue -= 512;      // depth=1 => winGameValue = 32255
+                                                     //         }
+calculate_winGameValue_depthZero:                    //     } else {
+                                                     //         winGameValue -= 0;            // depth=0 => winGameValue = 32767
+                                                     //     }
+ST.B (SP + CALCULATE_LOCAL_winGameValue), R1;
+
 //     let singlePawnJump = originPieceColor === whiteColor ? -10 : 10; // pawn direction for origin piece
 // 
 //     // TODO short circuit to go straight to correct origin square when modeMaxDepth === 1 and depth === 0
