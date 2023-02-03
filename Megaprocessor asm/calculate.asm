@@ -128,7 +128,8 @@ MODE1_CHECK_CAN_MOVE  EQU 1;
 MODE2_CALCULATE_MOVE  EQU 2;
 
 CALCULATE_LOCAL EQU 0;
-CALCULATE_LOCAL_winGameValue EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_singlePawnJump EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_winGameValue EQU CALCULATE_LOCAL_singlePawnJump + 2;
 CALCULATE_LOCAL_originPlayerIsInCheck EQU CALCULATE_LOCAL_winGameValue + 2;
 CALCULATE_LOCAL_bestGameValue EQU CALCULATE_LOCAL_originPlayerIsInCheck + 2;
 CALCULATE_LOCAL_originPieceColor EQU CALCULATE_LOCAL_bestGameValue + 2;
@@ -150,11 +151,12 @@ PUSH R0;                                             //     dim originPieceColor
 PUSH R0;                                             //     dim bestGameValue;
 PUSH R0;                                             //     dim originPlayerIsInCheck;
 PUSH R0;                                             //     dim winGameValue;
+PUSH R0;                                             //     dim singlePawnJump;
 
 LD.B R0, (SP + CALCULATE_ARG_opponentPieceColor);
-LD.B R1, #0b1000;
+LD.B R1, #PIECE_COLOUR_MASK;
 XOR R1, R0;
-ST.B (SP + CALCULATE_LOCAL_originPieceColor), R1;    //     originPieceColor = opponentPieceColor ^ 0b1000;
+ST.B (SP + CALCULATE_LOCAL_originPieceColor), R1;    //     originPieceColor = opponentPieceColor ^ PIECE_COLOUR_MASK;
 
 LD.B R0, #-32768;
 ST.B (SP + CALCULATE_LOCAL_bestGameValue), R1;       //     bestGameValue = -32768;
@@ -183,8 +185,16 @@ calculate_winGameValue_depthZero:                    //     } else {
                                                      //     }
 ST.B (SP + CALCULATE_LOCAL_winGameValue), R1;
 
-//     let singlePawnJump = originPieceColor === whiteColor ? -10 : 10; // pawn direction for origin piece
-// 
+LD.B R1, #10;                                        //     singlePawnJump = 10; // pawn direction for origin piece
+LD.B R0, (SP + CALCULATE_LOCAL_originPieceColor);
+LD.B R2, #PIECE_COLOUR_WHITE;
+CMP R0, R2;
+BNE calculate_singlePawnJump_black;                  //     if(originPieceColor == whiteColor) {
+NEG R1;                                              //         singlePawnJump = -singlePawnJump;
+calculate_singlePawnJump_black:                      //     }
+ST.B (SP + CALCULATE_LOCAL_singlePawnJump), R1;
+
+
 //     // TODO short circuit to go straight to correct origin square when modeMaxDepth === 1 and depth === 0
 //     for (let originSquareIndex = 21; originSquareIndex <= 98; originSquareIndex++) {
 //         let originSquareValue = boardState[originSquareIndex];
