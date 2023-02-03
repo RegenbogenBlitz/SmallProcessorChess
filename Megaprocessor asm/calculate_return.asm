@@ -1,0 +1,2 @@
+POP R0; // POP CALCULATE_LOCAL_originPieceColor
+RET;

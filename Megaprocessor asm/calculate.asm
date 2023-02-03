@@ -120,14 +120,36 @@ calculate_newEnPassantPawnIndex:
 DB 0;
 calculate_clickedBoardIndex:
 DB 0;
+calculate_returnValue:
+DW 0;
 
 MODE0_CHECK_FOR_CHECK EQU 0;
 MODE1_CHECK_CAN_MOVE  EQU 1;
 MODE2_CALCULATE_MOVE  EQU 2;
 
+CALCULATE_LOCAL EQU 0;
+CALCULATE_LOCAL_originPieceColor EQU CALCULATE_LOCAL;
+
+CALCULATE_returnAddress EQU CALCULATE_LOCAL_originPieceColor + 2;
+
+CALCULATE_ARG EQU CALCULATE_returnAddress + 2;
+
+CALCULATE_ARG_maxGameValueThatAvoidsPruning EQU CALCULATE_ARG;
+CALCULATE_ARG_modeMaxDepth EQU CALCULATE_ARG_maxGameValueThatAvoidsPruning + 2;
+CALCULATE_ARG_enPassantPawnIndex EQU CALCULATE_ARG_modeMaxDepth + 2;
+CALCULATE_ARG_depth EQU CALCULATE_ARG_enPassantPawnIndex + 2;
+CALCULATE_ARG_opponentPieceColor EQU CALCULATE_ARG_depth + 2;
+
 // MUST BE CALLED USING JSR and the stack
-calculate:                                   // const calculate = (opponentPieceColor, depth, enPassantPawnIndex, modeMaxDepth, maxGameValueThatAvoidsPruning) => {
-//     let originPieceColor = opponentPieceColor ^ 0b1000;
+calculate:                                           // const calculate = (opponentPieceColor, depth, enPassantPawnIndex, modeMaxDepth, maxGameValueThatAvoidsPruning) => {
+LD.B R0, #0;
+PUSH R0;                                             //     dim originPieceColor;
+
+LD.B R0, (SP + CALCULATE_ARG_opponentPieceColor);
+LD.B R1, #0b1000;
+XOR R1, R0;
+ST.B (SP + CALCULATE_LOCAL_originPieceColor), R1;    //     originPieceColor = opponentPieceColor ^ 0b1000;
+
 //     let bestGameValue = -100000000;
 //     let originPlayerIsInCheck = modeMaxDepth > 0 && calculate(originPieceColor, 0, undefined, 0) > 10000;
 //     const winGameValue = (78 - depth) * 512; // depth: 0=>39936, 1=>39424, 2=>38912
@@ -305,7 +327,9 @@ calculate:                                   // const calculate = (opponentPiece
                                              //     const returnValueCondition = (bestGameValue > 768 - winGameValue) || originPlayerIsInCheck;
                                              //     const positionGameValue = returnValueCondition ? bestGameValue : 0;
                                              //     return positionGameValue;
-RET;                                         //
+LD.W R0, #0;
+ST.W calculate_returnValue, R0;
+include "calculate_return.asm";              //
                                              // }
 
 on_click_return_address: DW;
@@ -331,22 +355,20 @@ JMP draw_board;                              //         draw_board();
                                              //
 on_click__clickedIsOtherValue:               //     } else {
                                              //
-LD.W R0, #0x7FFF;                            //
+LD.W R0, #0x8000;                            //
 MOVE SP, R0;                                 //         // reset SP
-LD.W R0, #0;                                 //
-PUSH R0;                                     //         // push space for result
 LD.B R0, #PIECE_COLOUR_BLACK;                //
-PUSH R0;                                     //         // push opponentPieceColor
+PUSH R0;                                     //         // push CALCULATE_ARG_opponentPieceColor
 LD.B R0, #0;                                 //
-PUSH R0;                                     //         // push depth
+PUSH R0;                                     //         // push CALCULATE_ARG_depth
 LD.B R0, calculate_newEnPassantPawnIndex;    //
-PUSH R0;                                     //         // push enPassantPawnIndex
+PUSH R0;                                     //         // push CALCULATE_ARG_enPassantPawnIndex
 LD.B R0, #MODE1_CHECK_CAN_MOVE;              //
-PUSH R0;                                     //         // push modeMaxDepth
+PUSH R0;                                     //         // push CALCULATE_ARG_modeMaxDepth
 LD.W R0, #0;                                 //
-PUSH R0;                                     //         // push maxGameValueThatAvoidsPruning
+PUSH R0;                                     //         // push CALCULATE_ARG_maxGameValueThatAvoidsPruning
                                              //
-JSR calculate;                               //         calculate(PIECE_COLOUR_BLACK, 0, calculate_newEnPassantPawnIndex, MODE1_CHECK_CAN_MOVE, 0);
+include "calculate_call.asm";                //         calculate(PIECE_COLOUR_BLACK, 0, calculate_newEnPassantPawnIndex, MODE1_CHECK_CAN_MOVE, 0);
                                              //     }
 on_click__return:                            //
 LD.W R0, on_click_return_address;            //
