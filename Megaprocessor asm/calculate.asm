@@ -150,9 +150,9 @@ LD.B R1, #0b1000;
 XOR R1, R0;
 ST.B (SP + CALCULATE_LOCAL_originPieceColor), R1;    //     originPieceColor = opponentPieceColor ^ 0b1000;
 
-//     let bestGameValue = -100000000;
+//     let bestGameValue = -32768;
 //     let originPlayerIsInCheck = modeMaxDepth > 0 && calculate(originPieceColor, 0, undefined, 0) > 10000;
-//     const winGameValue = (78 - depth) * 512; // depth: 0=>39936, 1=>39424, 2=>38912
+//     const winGameValue = 32767 - depth * 512; // depth: 0=>32767, 1=>32255, 2=>31743
 //     let singlePawnJump = originPieceColor === whiteColor ? -10 : 10; // pawn direction for origin piece
 // 
 //     // TODO short circuit to go straight to correct origin square when modeMaxDepth === 1 and depth === 0
