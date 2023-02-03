@@ -128,8 +128,9 @@ MODE1_CHECK_CAN_MOVE  EQU 1;
 MODE2_CALCULATE_MOVE  EQU 2;
 
 CALCULATE_LOCAL EQU 0;
-CALCULATE_LOCAL_bestGameValue EQU CALCULATE_LOCAL;
-CALCULATE_LOCAL_originPieceColor EQU CALCULATE_LOCAL + 2;
+CALCULATE_LOCAL_originPlayerIsInCheck EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_bestGameValue EQU CALCULATE_LOCAL_originPlayerIsInCheck + 2;
+CALCULATE_LOCAL_originPieceColor EQU CALCULATE_LOCAL_bestGameValue + 2;
 
 CALCULATE_returnAddress EQU CALCULATE_LOCAL_originPieceColor + 2;
 
@@ -147,13 +148,22 @@ LD.B R0, #0;
 PUSH R0;                                             //     dim originPieceColor;
 LD.B R0, #-32768;
 PUSH R0;                                             //     dim bestGameValue = -32768;
+LD.B R0, #0;
+PUSH R0;                                             //     dim originPlayerIsInCheck;
 
 LD.B R0, (SP + CALCULATE_ARG_opponentPieceColor);
 LD.B R1, #0b1000;
 XOR R1, R0;
 ST.B (SP + CALCULATE_LOCAL_originPieceColor), R1;    //     originPieceColor = opponentPieceColor ^ 0b1000;
 
-//     let originPlayerIsInCheck = modeMaxDepth > 0 && calculate(originPieceColor, 0, undefined, 0) > 10000;
+LD.B R0, (SP + CALCULATE_ARG_modeMaxDepth);
+BNE calculate__notModeZero;                          //     if(modeMaxDepth == 0) {
+// TODO TODO TODO TODO TODO                          //         originPlayerIsInCheck = calculate(originPieceColor, 0, undefined, 0) > 10000;
+                                                     //     }
+calculate__notModeZero:                              //     else {
+                                                     //         originPlayerIsInCheck = 0;
+                                                     //     }
+
 //     const winGameValue = 32767 - depth * 512; // depth: 0=>32767, 1=>32255, 2=>31743
 //     let singlePawnJump = originPieceColor === whiteColor ? -10 : 10; // pawn direction for origin piece
 // 
