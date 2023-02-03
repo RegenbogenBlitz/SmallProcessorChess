@@ -147,17 +147,17 @@ CALCULATE_ARG_opponentPieceColor EQU CALCULATE_ARG_depth + 2;
 calculate:                                           // const calculate = (opponentPieceColor, depth, enPassantPawnIndex, modeMaxDepth, maxGameValueThatAvoidsPruning) => {
 LD.B R0, #0;
 PUSH R0;                                             //     dim originPieceColor;
-LD.B R0, #-32768;
-PUSH R0;                                             //     dim bestGameValue = -32768;
-LD.B R0, #0;
+PUSH R0;                                             //     dim bestGameValue;
 PUSH R0;                                             //     dim originPlayerIsInCheck;
-LD.B R0, #0;
 PUSH R0;                                             //     dim winGameValue;
 
 LD.B R0, (SP + CALCULATE_ARG_opponentPieceColor);
 LD.B R1, #0b1000;
 XOR R1, R0;
 ST.B (SP + CALCULATE_LOCAL_originPieceColor), R1;    //     originPieceColor = opponentPieceColor ^ 0b1000;
+
+LD.B R0, #-32768;
+ST.B (SP + CALCULATE_LOCAL_bestGameValue), R1;       //     bestGameValue = -32768;
 
 LD.B R0, (SP + CALCULATE_ARG_modeMaxDepth);
 BNE calculate_originPlayerIsInCheck_notModeZero;     //     if(modeMaxDepth == 0) {
