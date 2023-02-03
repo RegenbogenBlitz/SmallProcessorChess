@@ -128,7 +128,8 @@ MODE1_CHECK_CAN_MOVE  EQU 1;
 MODE2_CALCULATE_MOVE  EQU 2;
 
 CALCULATE_LOCAL EQU 0;
-CALCULATE_LOCAL_singlePawnJump EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_originSquareIndex EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_singlePawnJump EQU CALCULATE_LOCAL_originSquareIndex + 2;
 CALCULATE_LOCAL_winGameValue EQU CALCULATE_LOCAL_singlePawnJump + 2;
 CALCULATE_LOCAL_originPlayerIsInCheck EQU CALCULATE_LOCAL_winGameValue + 2;
 CALCULATE_LOCAL_bestGameValue EQU CALCULATE_LOCAL_originPlayerIsInCheck + 2;
@@ -152,6 +153,7 @@ PUSH R0;                                             //     dim bestGameValue;
 PUSH R0;                                             //     dim originPlayerIsInCheck;
 PUSH R0;                                             //     dim winGameValue;
 PUSH R0;                                             //     dim singlePawnJump;
+PUSH R0;                                             //     dim originSquareIndex;
 
 LD.B R0, (SP + CALCULATE_ARG_opponentPieceColor);
 LD.B R1, #PIECE_COLOUR_MASK;
@@ -194,9 +196,10 @@ NEG R1;                                              //         singlePawnJump =
 calculate_singlePawnJump_black:                      //     }
 ST.B (SP + CALCULATE_LOCAL_singlePawnJump), R1;
 
+LD.B R0, #21;
+ST.B (SP + CALCULATE_LOCAL_originSquareIndex), R0;   //     originSquareIndex = 21;
+calculate_forloop_start:                             //     do {
 
-//     // TODO short circuit to go straight to correct origin square when modeMaxDepth === 1 and depth === 0
-//     for (let originSquareIndex = 21; originSquareIndex <= 98; originSquareIndex++) {
 //         let originSquareValue = boardState[originSquareIndex];
 //         const movedOriginPieceValue = originSquareValue & 0b1111;
 //         const colorlessOriginPieceValue = movedOriginPieceValue ^ originPieceColor; // pawn 1, king 2, knight 3, bishop 4, rook 5, queen 6
@@ -362,15 +365,24 @@ ST.B (SP + CALCULATE_LOCAL_singlePawnJump), R1;
 //             } while (pieceCanSlide || thereAreMoreMoves)
 // 
 //         }
-//     }
-                                             //
-                                             //     const returnValueCondition = (bestGameValue > 768 - winGameValue) || originPlayerIsInCheck;
-                                             //     const positionGameValue = returnValueCondition ? bestGameValue : 0;
-                                             //     return positionGameValue;
+
+LD.B R0, (SP + CALCULATE_LOCAL_originSquareIndex);
+INC R0;                                              //         originSquareIndex++;
+ST.B (SP + CALCULATE_LOCAL_originSquareIndex), R0;
+LD.B R1, #98;
+CMP R0, R1;
+BGT calculate_forloop_end;
+JMP calculate_forloop_start;
+calculate_forloop_end:                               //     } while (originSquareIndex <= 98)
+
+// TODO TODO TODO TODO TODO                          //     const returnValueCondition = (bestGameValue > 768 - winGameValue) || originPlayerIsInCheck;
+// TODO TODO TODO TODO TODO                          //     const positionGameValue = returnValueCondition ? bestGameValue : 0;
+// TODO TODO TODO TODO TODO                          //     return positionGameValue;
+
 LD.W R0, #0;
 ST.W calculate_returnValue, R0;
-include "calculate_return.asm";              //
-                                             // }
+include "calculate_return.asm";                      //
+                                                     // }
 
 on_click_return_address: DW;
 
