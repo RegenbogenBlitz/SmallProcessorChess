@@ -128,7 +128,8 @@ MODE1_CHECK_CAN_MOVE  EQU 1;
 MODE2_CALCULATE_MOVE  EQU 2;
 
 CALCULATE_LOCAL EQU 0;
-CALCULATE_LOCAL_originPieceColor EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_bestGameValue EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_originPieceColor EQU CALCULATE_LOCAL + 2;
 
 CALCULATE_returnAddress EQU CALCULATE_LOCAL_originPieceColor + 2;
 
@@ -144,13 +145,14 @@ CALCULATE_ARG_opponentPieceColor EQU CALCULATE_ARG_depth + 2;
 calculate:                                           // const calculate = (opponentPieceColor, depth, enPassantPawnIndex, modeMaxDepth, maxGameValueThatAvoidsPruning) => {
 LD.B R0, #0;
 PUSH R0;                                             //     dim originPieceColor;
+LD.B R0, #-32768;
+PUSH R0;                                             //     dim bestGameValue = -32768;
 
 LD.B R0, (SP + CALCULATE_ARG_opponentPieceColor);
 LD.B R1, #0b1000;
 XOR R1, R0;
 ST.B (SP + CALCULATE_LOCAL_originPieceColor), R1;    //     originPieceColor = opponentPieceColor ^ 0b1000;
 
-//     let bestGameValue = -32768;
 //     let originPlayerIsInCheck = modeMaxDepth > 0 && calculate(originPieceColor, 0, undefined, 0) > 10000;
 //     const winGameValue = 32767 - depth * 512; // depth: 0=>32767, 1=>32255, 2=>31743
 //     let singlePawnJump = originPieceColor === whiteColor ? -10 : 10; // pawn direction for origin piece
