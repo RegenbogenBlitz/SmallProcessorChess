@@ -160,8 +160,8 @@ LD.B R1, #PIECE_COLOUR_MASK;
 XOR R1, R0;
 ST.B (SP + CALCULATE_LOCAL_originPieceColor), R1;    //     originPieceColor = opponentPieceColor ^ PIECE_COLOUR_MASK;
 
-LD.B R0, #-32768;
-ST.B (SP + CALCULATE_LOCAL_bestGameValue), R1;       //     bestGameValue = -32768;
+LD.W R0, #-32768;
+ST.W (SP + CALCULATE_LOCAL_bestGameValue), R1;       //     bestGameValue = -32768;
 
 LD.B R0, #0;
 ST.B (SP + CALCULATE_LOCAL_originPlayerIsInCheck), R0;
@@ -172,10 +172,10 @@ calculate_originPlayerIsInCheck_notModeZero:         //     } else {
                                                      //         originPlayerIsInCheck = false;
                                                      //     }
 
-LD.B R1, #32767;                                     //     winGameValue = 32767;
+LD.W R1, #32767;                                     //     winGameValue = 32767;
 LD.B R0, (SP + CALCULATE_ARG_depth);
 BEQ calculate_winGameValue_depthZero;                //     if(depth != 0) {
-LD.B R3, #-512;
+LD.W R3, #-512;
 LD.B R2, #1;
 CMP R0, R2;
 BEQ calculate_winGameValue_depthOne;                 //         if(depth != 1) {
@@ -187,7 +187,7 @@ ADD R1, R3;                                          //             winGameValue
 calculate_winGameValue_depthZero:                    //     } else {
                                                      //         winGameValue -= 0;            // depth=0 => winGameValue = 32767
                                                      //     }
-ST.B (SP + CALCULATE_LOCAL_winGameValue), R1;
+ST.W (SP + CALCULATE_LOCAL_winGameValue), R1;
 
 LD.B R1, #10;                                        //     singlePawnJump = 10; // pawn direction for origin piece
 LD.B R0, (SP + CALCULATE_LOCAL_originPieceColor);
