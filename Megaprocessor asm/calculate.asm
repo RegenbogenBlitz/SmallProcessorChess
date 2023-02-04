@@ -262,16 +262,42 @@ ST.B (SP + CALCULATE_LOCAL_colorlessOriginPieceValue), R2;       //             
 LD.B R3, #0;
 CMP R0,R1;
 BEQ calculate_originSquareValue_pieceHasMoved;
-INV R3;
+LD.B R3, #0xFF;
 calculate_originSquareValue_pieceHasMoved:
 ST.B (SP + CALCULATE_LOCAL_originPieceIsOnOriginalSquare), R3;   //             originPieceIsOnOriginalSquare = (originSquareValue !== movedOriginPieceValue);
 
-//             const originPieceIsAPawn = colorlessOriginPieceValue === pawnPieceValue;
-//             const originPieceIsAKing = colorlessOriginPieceValue === kingPieceValue;
-//             const originPieceIsSlidey = colorlessOriginPieceValue >= 4;
-// 
-//             let moveDirectionNumber = (colorlessOriginPieceValue & 2) ? 8 : 4; // number of move directions: pawn 4, king 8, knight 8, bishop 4, rook 4, queen 8
-// 
+LD.B R3, #0;
+LD.B R0, #PIECE_ENUM_PAWN;
+CMP R2,R0;
+BNE calculate_originSquareValue_isNotPawn;
+LD.B R3, #0xFF;
+calculate_originSquareValue_isNotPawn:
+ST.B (SP + CALCULATE_LOCAL_originPieceIsAPawn), R3;              //             originPieceIsAPawn = (colorlessOriginPieceValue === PIECE_ENUM_PAWN);
+
+LD.B R3, #0;
+LD.B R0, #PIECE_ENUM_KING;
+CMP R2,R0;
+BNE calculate_originSquareValue_isNotKing;
+LD.B R3, #0xFF;
+calculate_originSquareValue_isNotKing:
+ST.B (SP + CALCULATE_LOCAL_originPieceIsAKing), R3;              //             originPieceIsAKing = (colorlessOriginPieceValue === PIECE_ENUM_KING);
+
+LD.B R3, #0;
+LD.B R0, #4;
+CMP R2,R0;
+BLT calculate_originSquareValue_isNotSlidey;
+LD.B R3, #0xFF;
+calculate_originSquareValue_isNotSlidey:
+ST.B (SP + CALCULATE_LOCAL_originPieceIsSlidey), R3;             //             originPieceIsSlidey = (colorlessOriginPieceValue >= 4);
+
+LD.B R3, #4;
+LD.B R0, #0b0010;
+AND R0,R2;
+BEQ calculate_originSquareValue_isNot8Directional;
+LD.B R3, #8;
+calculate_originSquareValue_isNot8Directional:
+ST.B (SP + CALCULATE_LOCAL_moveDirectionNumber), R3;             //             moveDirectionNumber = (colorlessOriginPieceValue & 2) ? 8 : 4; // number of move directions: pawn 4, king 8, knight 8, bishop 4, rook 4, queen 8
+
 //             let initialMoveDirectionIndex = movedOriginPieceValue === whitePawnPieceValue ? 10 : initialMoveDirectionIndexes[colorlessOriginPieceValue - 1];
 //             let targetSquareIndex = originSquareIndex;
 //             let pieceCanSlide;
