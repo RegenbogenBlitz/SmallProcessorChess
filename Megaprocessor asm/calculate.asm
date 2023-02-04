@@ -3,6 +3,7 @@ PIECE_COLOUR_WHITE  EQU 0b00001000;
 PIECE_COLOUR_BLACK  EQU 0b00000000;
 
 UNMOVED_PIECE       EQU 0b00110000;
+PIECE_VALUE_MASK    EQU 0b00001111;
 
 PIECE_ENUM_EMPTY    EQU 0b00000000;
 PIECE_ENUM_PAWN     EQU 0b00000001;
@@ -128,7 +129,8 @@ MODE1_CHECK_CAN_MOVE  EQU 1;
 MODE2_CALCULATE_MOVE  EQU 2;
 
 CALCULATE_LOCAL EQU 0;
-CALCULATE_LOCAL_originSquareValue EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_movedOriginPieceValue EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_originSquareValue EQU CALCULATE_LOCAL_movedOriginPieceValue + 2;
 CALCULATE_LOCAL_originSquareIndex EQU CALCULATE_LOCAL_originSquareValue + 2;
 CALCULATE_LOCAL_singlePawnJump EQU CALCULATE_LOCAL_originSquareIndex + 2;
 CALCULATE_LOCAL_winGameValue EQU CALCULATE_LOCAL_singlePawnJump + 2;
@@ -156,6 +158,7 @@ PUSH R0;                                                 //     dim winGameValue
 PUSH R0;                                                 //     dim singlePawnJump;
 PUSH R0;                                                 //     dim originSquareIndex;
 PUSH R0;                                                 //     dim originSquareValue;
+PUSH R0;                                                 //     dim movedOriginPieceValue;
 
 LD.B R0, (SP + CALCULATE_ARG_opponentPieceColor);
 LD.B R1, #PIECE_COLOUR_MASK;
@@ -209,8 +212,10 @@ ADD R2, R0;
 LD.B R0, (R2);
 ST.B (SP + CALCULATE_LOCAL_originSquareValue), R0;       //         originSquareValue = boardState[originSquareIndex];
 
-//         
-//         const movedOriginPieceValue = originSquareValue & 0b1111;
+LD.B R1, #PIECE_VALUE_MASK;
+AND R1,R0;
+ST.B (SP + CALCULATE_LOCAL_movedOriginPieceValue), R1;   //         movedOriginPieceValue = originSquareValue & PIECE_VALUE_MASK;
+
 //         const colorlessOriginPieceValue = movedOriginPieceValue ^ originPieceColor; // pawn 1, king 2, knight 3, bishop 4, rook 5, queen 6
 //         const originSquareIsEmpty = originSquareValue === 0;
 //         const originIsPieceOfOwnColorOrEmpty = colorlessOriginPieceValue < 7; // 0: empty, 1-6 own color piece, 7 off-board;
