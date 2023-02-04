@@ -129,7 +129,8 @@ MODE1_CHECK_CAN_MOVE  EQU 1;
 MODE2_CALCULATE_MOVE  EQU 2;
 
 CALCULATE_LOCAL EQU 0;
-CALCULATE_LOCAL_movedOriginPieceValue EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_colorlessOriginPieceValue EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_movedOriginPieceValue EQU CALCULATE_LOCAL_colorlessOriginPieceValue + 2;
 CALCULATE_LOCAL_originSquareValue EQU CALCULATE_LOCAL_movedOriginPieceValue + 2;
 CALCULATE_LOCAL_originSquareIndex EQU CALCULATE_LOCAL_originSquareValue + 2;
 CALCULATE_LOCAL_singlePawnJump EQU CALCULATE_LOCAL_originSquareIndex + 2;
@@ -159,6 +160,7 @@ PUSH R0;                                                     //     dim singlePa
 PUSH R0;                                                     //     dim originSquareIndex;
 PUSH R0;                                                     //     dim originSquareValue;
 PUSH R0;                                                     //     dim movedOriginPieceValue;
+PUSH R0;                                                     //     dim colorlessOriginPieceValue;
 
 LD.B R0, (SP + CALCULATE_ARG_opponentPieceColor);
 LD.B R1, #PIECE_COLOUR_MASK;
@@ -216,7 +218,10 @@ LD.B R1, #PIECE_VALUE_MASK;
 AND R1,R0;
 ST.B (SP + CALCULATE_LOCAL_movedOriginPieceValue), R1;       //         movedOriginPieceValue = originSquareValue & PIECE_VALUE_MASK;
 
-//         const colorlessOriginPieceValue = movedOriginPieceValue ^ originPieceColor; // pawn 1, king 2, knight 3, bishop 4, rook 5, queen 6
+LD.B R2, (SP + CALCULATE_LOCAL_originPieceColor);
+XOR R2,R1;
+ST.B (SP + CALCULATE_LOCAL_colorlessOriginPieceValue), R2;   //         colorlessOriginPieceValue = movedOriginPieceValue ^ originPieceColor; // pawn 1, king 2, knight 3, bishop 4, rook 5, queen 6
+
 //         const originSquareIsEmpty = originSquareValue === 0;
 //         const originIsPieceOfOwnColorOrEmpty = colorlessOriginPieceValue < 7; // 0: empty, 1-6 own color piece, 7 off-board;
 // 
