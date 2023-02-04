@@ -149,72 +149,72 @@ CALCULATE_ARG_depth EQU CALCULATE_ARG_enPassantPawnIndex + 2;
 CALCULATE_ARG_opponentPieceColor EQU CALCULATE_ARG_depth + 2;
 
 // MUST BE CALLED USING JSR and the stack
-calculate:                                               // const calculate = (opponentPieceColor, depth, enPassantPawnIndex, modeMaxDepth, maxGameValueThatAvoidsPruning) => {
+calculate:                                                   // const calculate = (opponentPieceColor, depth, enPassantPawnIndex, modeMaxDepth, maxGameValueThatAvoidsPruning) => {
 LD.B R0, #0;
-PUSH R0;                                                 //     dim originPieceColor;
-PUSH R0;                                                 //     dim bestGameValue;
-PUSH R0;                                                 //     dim originPlayerIsInCheck;
-PUSH R0;                                                 //     dim winGameValue;
-PUSH R0;                                                 //     dim singlePawnJump;
-PUSH R0;                                                 //     dim originSquareIndex;
-PUSH R0;                                                 //     dim originSquareValue;
-PUSH R0;                                                 //     dim movedOriginPieceValue;
+PUSH R0;                                                     //     dim originPieceColor;
+PUSH R0;                                                     //     dim bestGameValue;
+PUSH R0;                                                     //     dim originPlayerIsInCheck;
+PUSH R0;                                                     //     dim winGameValue;
+PUSH R0;                                                     //     dim singlePawnJump;
+PUSH R0;                                                     //     dim originSquareIndex;
+PUSH R0;                                                     //     dim originSquareValue;
+PUSH R0;                                                     //     dim movedOriginPieceValue;
 
 LD.B R0, (SP + CALCULATE_ARG_opponentPieceColor);
 LD.B R1, #PIECE_COLOUR_MASK;
 XOR R1, R0;
-ST.B (SP + CALCULATE_LOCAL_originPieceColor), R1;        //     originPieceColor = opponentPieceColor ^ PIECE_COLOUR_MASK;
+ST.B (SP + CALCULATE_LOCAL_originPieceColor), R1;            //     originPieceColor = opponentPieceColor ^ PIECE_COLOUR_MASK;
 
 LD.W R0, #-32768;
-ST.W (SP + CALCULATE_LOCAL_bestGameValue), R1;           //     bestGameValue = -32768;
+ST.W (SP + CALCULATE_LOCAL_bestGameValue), R1;               //     bestGameValue = -32768;
 
 LD.B R0, #0;
 ST.B (SP + CALCULATE_LOCAL_originPlayerIsInCheck), R0;
 LD.B R0, (SP + CALCULATE_ARG_modeMaxDepth);
-BNE calculate_originPlayerIsInCheck_notModeZero;         //     if(modeMaxDepth == 0) {
-// TODO TODO TODO TODO TODO                              //         originPlayerIsInCheck = calculate(originPieceColor, 0, undefined, 0) > 10000;
-calculate_originPlayerIsInCheck_notModeZero:             //     } else {
-                                                         //         originPlayerIsInCheck = false;
-                                                         //     }
+BNE calculate_originPlayerIsInCheck_notModeZero;             //     if(modeMaxDepth == 0) {
+// TODO TODO TODO TODO TODO                                  //         originPlayerIsInCheck = calculate(originPieceColor, 0, undefined, 0) > 10000;
+calculate_originPlayerIsInCheck_notModeZero:                 //     } else {
+                                                             //         originPlayerIsInCheck = false;
+                                                             //     }
 
-LD.W R1, #32767;                                         //     winGameValue = 32767;
+LD.W R1, #32767;                                             //     winGameValue = 32767;
 LD.B R0, (SP + CALCULATE_ARG_depth);
-BEQ calculate_winGameValue_depthZero;                    //     if(depth != 0) {
+BEQ calculate_winGameValue_depthZero;                        //     if(depth != 0) {
 LD.W R3, #-512;
 LD.B R2, #1;
 CMP R0, R2;
-BEQ calculate_winGameValue_depthOne;                     //         if(depth != 1) {
+BEQ calculate_winGameValue_depthOne;                         //         if(depth != 1) {
 
-ADD R1, R3;                                              //             winGameValue -= 512 * 2;  // depth=2 => winGameValue = 31743
-calculate_winGameValue_depthOne:                         //         } else {
-ADD R1, R3;                                              //             winGameValue -= 512;      // depth=1 => winGameValue = 32255
-                                                         //         }
-calculate_winGameValue_depthZero:                        //     } else {
-                                                         //         winGameValue -= 0;            // depth=0 => winGameValue = 32767
-                                                         //     }
+ADD R1, R3;                                                  //             winGameValue -= 512 * 2;  // depth=2 => winGameValue = 31743
+calculate_winGameValue_depthOne:                             //         } else {
+ADD R1, R3;                                                  //             winGameValue -= 512;      // depth=1 => winGameValue = 32255
+                                                             //         }
+calculate_winGameValue_depthZero:                            //     } else {
+                                                             //         winGameValue -= 0;            // depth=0 => winGameValue = 32767
+                                                             //     }
 ST.W (SP + CALCULATE_LOCAL_winGameValue), R1;
 
-LD.B R1, #10;                                            //     singlePawnJump = 10; // pawn direction for origin piece
+LD.B R1, #10;                                                //     singlePawnJump = 10; // pawn direction for origin piece
 LD.B R0, (SP + CALCULATE_LOCAL_originPieceColor);
 LD.B R2, #PIECE_COLOUR_WHITE;
 CMP R0, R2;
-BNE calculate_singlePawnJump_black;                      //     if(originPieceColor == whiteColor) {
-NEG R1;                                                  //         singlePawnJump = -singlePawnJump;
-calculate_singlePawnJump_black:                          //     }
+BNE calculate_singlePawnJump_black;                          //     if(originPieceColor == whiteColor) {
+NEG R1;                                                      //         singlePawnJump = -singlePawnJump;
+calculate_singlePawnJump_black:                              //     }
 ST.B (SP + CALCULATE_LOCAL_singlePawnJump), R1;
 
 LD.B R0, #21;
-ST.B (SP + CALCULATE_LOCAL_originSquareIndex), R0;       //     originSquareIndex = 21;
-calculate_forloop_start:                                 //     do {
+ST.B (SP + CALCULATE_LOCAL_originSquareIndex), R0;           //     originSquareIndex = 21;
+calculate_forloop_start:                                     //     do {
 
 LD.B R2, #boardState;
 ADD R2, R0;
 LD.B R0, (R2);
-ST.B (SP + CALCULATE_LOCAL_originSquareValue), R0;       //         originSquareValue = boardState[originSquareIndex];
+ST.B (SP + CALCULATE_LOCAL_originSquareValue), R0;           //         originSquareValue = boardState[originSquareIndex];
 
 LD.B R1, #PIECE_VALUE_MASK;
 AND R1,R0;
-ST.B (SP + CALCULATE_LOCAL_movedOriginPieceValue), R1;   //         movedOriginPieceValue = originSquareValue & PIECE_VALUE_MASK;
+ST.B (SP + CALCULATE_LOCAL_movedOriginPieceValue), R1;       //         movedOriginPieceValue = originSquareValue & PIECE_VALUE_MASK;
 
 //         const colorlessOriginPieceValue = movedOriginPieceValue ^ originPieceColor; // pawn 1, king 2, knight 3, bishop 4, rook 5, queen 6
 //         const originSquareIsEmpty = originSquareValue === 0;
@@ -381,68 +381,68 @@ ST.B (SP + CALCULATE_LOCAL_movedOriginPieceValue), R1;   //         movedOriginP
 //         }
 
 LD.B R0, (SP + CALCULATE_LOCAL_originSquareIndex);
-INC R0;                                                  //         originSquareIndex++;
+INC R0;                                                      //         originSquareIndex++;
 ST.B (SP + CALCULATE_LOCAL_originSquareIndex), R0;
 LD.B R1, #98;
 CMP R0, R1;
 BGT calculate_forloop_end;
 JMP calculate_forloop_start;
-calculate_forloop_end:                                   //     } while (originSquareIndex <= 98)
+calculate_forloop_end:                                       //     } while (originSquareIndex <= 98)
 
 LD.W R2, #768;
 LD.W R1, (SP + CALCULATE_LOCAL_winGameValue);
 SUB R2, R1;
-LD.W R0, (SP + CALCULATE_LOCAL_bestGameValue);           //     let positionGameValue = bestGameValue;
+LD.W R0, (SP + CALCULATE_LOCAL_bestGameValue);               //     let positionGameValue = bestGameValue;
 CMP R0,R2;
-BGT calculate__returnCalcValue;                          //     if(!(bestGameValue > 768 - winGameValue) &&
+BGT calculate__returnCalcValue;                              //     if(!(bestGameValue > 768 - winGameValue) &&
 LD.W R1, (SP + CALCULATE_LOCAL_originPlayerIsInCheck);
-BNE calculate__returnCalcValue;                          //         !originPlayerIsInCheck) {
+BNE calculate__returnCalcValue;                              //         !originPlayerIsInCheck) {
 
-LD.W R0, #0;                                             //         positionGameValue = 0;
-calculate__returnCalcValue:                              //     }
+LD.W R0, #0;                                                 //         positionGameValue = 0;
+calculate__returnCalcValue:                                  //     }
 ST.W calculate_returnValue, R0;
-include "calculate_return.asm";                          //     return positionGameValue;
-                                                         // }
+include "calculate_return.asm";                              //     return positionGameValue;
+                                                             // }
 
 on_click_return_address: DW;
 
-on_click:                                                // const on_click = () => {
-ST.W on_click_return_address, R0;                        //
-                                                         //
-LD.B R0, global_cursor_square_index;                     //
-ST.B calculate_clickedBoardIndex, R0;                    //     calculate_clickedBoardIndex = global_cursor_square_index;
-                                                         //
-LD.B R2, #boardState;                                    //
-ADD R2,R0;                                               //
-LD.B R1, (R2);                                           //     const clickedBoardState = boardState[calculate_clickedBoardIndex];
-LD.B R3, #PIECE_COLOUR_WHITE;                            //
-AND R3,R1;                                               //     const clickedIsWhitePiece = (clickedBoardState & whiteColor) !== 0;
-BNE on_click__clickedIsWhitePiece;                       //     if (boardValueIsWhitePiece) {
-JMP on_click__clickedIsOtherValue;                       //
-on_click__clickedIsWhitePiece:                           //
-ST.B global_selected_square_index, R0;                   //         global_selected_square_index = calculate_clickedBoardIndex;
-                                                         //
-LD.W R0, #on_click__return;                              //         // TODO improve performance by refreshing just the relevant squares
-JMP draw_board;                                          //         draw_board();
-                                                         //
-on_click__clickedIsOtherValue:                           //     } else {
-                                                         //
-LD.W R0, #0x8000;                                        //
-MOVE SP, R0;                                             //         // reset SP
-LD.B R0, #PIECE_COLOUR_BLACK;                            //
-PUSH R0;                                                 //         // push CALCULATE_ARG_opponentPieceColor
-LD.B R0, #0;                                             //
-PUSH R0;                                                 //         // push CALCULATE_ARG_depth
-LD.B R0, calculate_newEnPassantPawnIndex;                //
-PUSH R0;                                                 //         // push CALCULATE_ARG_enPassantPawnIndex
-LD.B R0, #MODE1_CHECK_CAN_MOVE;                          //
-PUSH R0;                                                 //         // push CALCULATE_ARG_modeMaxDepth
-LD.W R0, #0;                                             //
-PUSH R0;                                                 //         // push CALCULATE_ARG_maxGameValueThatAvoidsPruning
-                                                         //
-include "calculate_call.asm";                            //         calculate(PIECE_COLOUR_BLACK, 0, calculate_newEnPassantPawnIndex, MODE1_CHECK_CAN_MOVE, 0);
-                                                         //     }
-on_click__return:                                        //
-LD.W R0, on_click_return_address;                        //
-JMP (R0);                                                //     return;
-                                                         // };
+on_click:                                                    // const on_click = () => {
+ST.W on_click_return_address, R0;                            //
+                                                             //
+LD.B R0, global_cursor_square_index;                         //
+ST.B calculate_clickedBoardIndex, R0;                        //     calculate_clickedBoardIndex = global_cursor_square_index;
+                                                             //
+LD.B R2, #boardState;                                        //
+ADD R2,R0;                                                   //
+LD.B R1, (R2);                                               //     const clickedBoardState = boardState[calculate_clickedBoardIndex];
+LD.B R3, #PIECE_COLOUR_WHITE;                                //
+AND R3,R1;                                                   //     const clickedIsWhitePiece = (clickedBoardState & whiteColor) !== 0;
+BNE on_click__clickedIsWhitePiece;                           //     if (boardValueIsWhitePiece) {
+JMP on_click__clickedIsOtherValue;                           //
+on_click__clickedIsWhitePiece:                               //
+ST.B global_selected_square_index, R0;                       //         global_selected_square_index = calculate_clickedBoardIndex;
+                                                             //
+LD.W R0, #on_click__return;                                  //         // TODO improve performance by refreshing just the relevant squares
+JMP draw_board;                                              //         draw_board();
+                                                             //
+on_click__clickedIsOtherValue:                               //     } else {
+                                                             //
+LD.W R0, #0x8000;                                            //
+MOVE SP, R0;                                                 //         // reset SP
+LD.B R0, #PIECE_COLOUR_BLACK;                                //
+PUSH R0;                                                     //         // push CALCULATE_ARG_opponentPieceColor
+LD.B R0, #0;                                                 //
+PUSH R0;                                                     //         // push CALCULATE_ARG_depth
+LD.B R0, calculate_newEnPassantPawnIndex;                    //
+PUSH R0;                                                     //         // push CALCULATE_ARG_enPassantPawnIndex
+LD.B R0, #MODE1_CHECK_CAN_MOVE;                              //
+PUSH R0;                                                     //         // push CALCULATE_ARG_modeMaxDepth
+LD.W R0, #0;                                                 //
+PUSH R0;                                                     //         // push CALCULATE_ARG_maxGameValueThatAvoidsPruning
+                                                             //
+include "calculate_call.asm";                                //         calculate(PIECE_COLOUR_BLACK, 0, calculate_newEnPassantPawnIndex, MODE1_CHECK_CAN_MOVE, 0);
+                                                             //     }
+on_click__return:                                            //
+LD.W R0, on_click_return_address;                            //
+JMP (R0);                                                    //     return;
+                                                             // };
