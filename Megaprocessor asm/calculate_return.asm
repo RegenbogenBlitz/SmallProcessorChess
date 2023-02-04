@@ -8,4 +8,13 @@ POP R0; // POP CALCULATE_LOCAL_originSquareValue
 POP R0; // POP CALCULATE_LOCAL_movedOriginPieceValue
 POP R0; // POP CALCULATE_LOCAL_colorlessOriginPieceValue
 POP R0; // POP CALCULATE_LOCAL_originPieceIsOnOriginalSquare
+POP R0; // POP CALCULATE_LOCAL_originPieceIsAPawn
+POP R0; // POP CALCULATE_LOCAL_originPieceIsAKing
+POP R0; // POP CALCULATE_LOCAL_originPieceIsSlidey
+POP R0; // POP CALCULATE_LOCAL_moveDirectionNumber;
+POP R0; // POP CALCULATE_LOCAL_initialMoveDirectionIndex;
+POP R0; // POP CALCULATE_LOCAL_targetSquareIndex;
+POP R0; // POP CALCULATE_LOCAL_targetSquareValue;
+POP R0; // POP CALCULATE_LOCAL_pieceCanSlide;
+POP R0; // POP CALCULATE_LOCAL_thereAreMoreMoves;
 RET;

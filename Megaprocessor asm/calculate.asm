@@ -129,7 +129,16 @@ MODE1_CHECK_CAN_MOVE  EQU 1;
 MODE2_CALCULATE_MOVE  EQU 2;
 
 CALCULATE_LOCAL EQU 0;
-CALCULATE_LOCAL_originPieceIsOnOriginalSquare EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_thereAreMoreMoves EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_pieceCanSlide EQU CALCULATE_LOCAL_thereAreMoreMoves + 2;
+CALCULATE_LOCAL_targetSquareValue EQU CALCULATE_LOCAL_pieceCanSlide + 2;
+CALCULATE_LOCAL_targetSquareIndex EQU CALCULATE_LOCAL_targetSquareValue + 2;
+CALCULATE_LOCAL_initialMoveDirectionIndex EQU CALCULATE_LOCAL_targetSquareIndex + 2;
+CALCULATE_LOCAL_moveDirectionNumber EQU CALCULATE_LOCAL_initialMoveDirectionIndex + 2;
+CALCULATE_LOCAL_originPieceIsSlidey EQU CALCULATE_LOCAL_moveDirectionNumber + 2;
+CALCULATE_LOCAL_originPieceIsAKing EQU CALCULATE_LOCAL_originPieceIsSlidey + 2;
+CALCULATE_LOCAL_originPieceIsAPawn EQU CALCULATE_LOCAL_originPieceIsAKing + 2;
+CALCULATE_LOCAL_originPieceIsOnOriginalSquare EQU CALCULATE_LOCAL_originPieceIsAPawn + 2;
 CALCULATE_LOCAL_colorlessOriginPieceValue EQU CALCULATE_LOCAL_originPieceIsOnOriginalSquare + 2;
 CALCULATE_LOCAL_movedOriginPieceValue EQU CALCULATE_LOCAL_colorlessOriginPieceValue + 2;
 CALCULATE_LOCAL_originSquareValue EQU CALCULATE_LOCAL_movedOriginPieceValue + 2;
@@ -163,6 +172,15 @@ PUSH R0;                                                         //     dim orig
 PUSH R0;                                                         //     dim movedOriginPieceValue;
 PUSH R0;                                                         //     dim colorlessOriginPieceValue;
 PUSH R0;                                                         //     dim originPieceIsOnOriginalSquare;
+PUSH R0;                                                         //     dim originPieceIsAPawn;
+PUSH R0;                                                         //     dim originPieceIsAKing;
+PUSH R0;                                                         //     dim originPieceIsSlidey;
+PUSH R0;                                                         //     dim moveDirectionNumber;
+PUSH R0;                                                         //     dim initialMoveDirectionIndex;
+PUSH R0;                                                         //     dim targetSquareIndex;
+PUSH R0;                                                         //     dim targetSquareValue;
+PUSH R0;                                                         //     dim pieceCanSlide;
+PUSH R0;                                                         //     dim thereAreMoreMoves;
 
 LD.B R0, (SP + CALCULATE_ARG_opponentPieceColor);
 LD.B R1, #PIECE_COLOUR_MASK;
