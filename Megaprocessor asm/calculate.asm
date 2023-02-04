@@ -129,7 +129,8 @@ MODE1_CHECK_CAN_MOVE  EQU 1;
 MODE2_CALCULATE_MOVE  EQU 2;
 
 CALCULATE_LOCAL EQU 0;
-CALCULATE_LOCAL_colorlessOriginPieceValue EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_originPieceIsOnOriginalSquare EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_colorlessOriginPieceValue EQU CALCULATE_LOCAL_originPieceIsOnOriginalSquare + 2;
 CALCULATE_LOCAL_movedOriginPieceValue EQU CALCULATE_LOCAL_colorlessOriginPieceValue + 2;
 CALCULATE_LOCAL_originSquareValue EQU CALCULATE_LOCAL_movedOriginPieceValue + 2;
 CALCULATE_LOCAL_originSquareIndex EQU CALCULATE_LOCAL_originSquareValue + 2;
@@ -161,6 +162,7 @@ PUSH R0;                                                         //     dim orig
 PUSH R0;                                                         //     dim originSquareValue;
 PUSH R0;                                                         //     dim movedOriginPieceValue;
 PUSH R0;                                                         //     dim colorlessOriginPieceValue;
+PUSH R0;                                                         //     dim originPieceIsOnOriginalSquare;
 
 LD.B R0, (SP + CALCULATE_ARG_opponentPieceColor);
 LD.B R1, #PIECE_COLOUR_MASK;
@@ -239,7 +241,13 @@ ST.B (SP + CALCULATE_LOCAL_movedOriginPieceValue), R1;           //             
 XOR R2,R1;
 ST.B (SP + CALCULATE_LOCAL_colorlessOriginPieceValue), R2;       //             colorlessOriginPieceValue = movedOriginPieceValue ^ originPieceColor; // pawn 1, king 2, knight 3, bishop 4, rook 5, queen 6
 
-//             const originPieceIsOnOriginalSquare = 0b1111 < originSquareValue;
+LD.B R3, #0;
+CMP R0,R1;
+BEQ calculate_originSquareValue_pieceHasMoved;
+INV R3;
+calculate_originSquareValue_pieceHasMoved:
+ST.B (SP + CALCULATE_LOCAL_originPieceIsOnOriginalSquare), R3;   //             originPieceIsOnOriginalSquare = (originSquareValue !== movedOriginPieceValue);
+
 //             const originPieceIsAPawn = colorlessOriginPieceValue === pawnPieceValue;
 //             const originPieceIsAKing = colorlessOriginPieceValue === kingPieceValue;
 //             const originPieceIsSlidey = colorlessOriginPieceValue >= 4;
