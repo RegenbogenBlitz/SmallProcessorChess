@@ -377,13 +377,19 @@ BGT calculate_forloop_end;
 JMP calculate_forloop_start;
 calculate_forloop_end:                               //     } while (originSquareIndex <= 98)
 
-// TODO TODO TODO TODO TODO                          //     const returnValueCondition = (bestGameValue > 768 - winGameValue) || originPlayerIsInCheck;
-// TODO TODO TODO TODO TODO                          //     const positionGameValue = returnValueCondition ? bestGameValue : 0;
-// TODO TODO TODO TODO TODO                          //     return positionGameValue;
+LD.W R2, #768;
+LD.W R1, (SP + CALCULATE_LOCAL_winGameValue);
+SUB R2, R1;
+LD.W R0, (SP + CALCULATE_LOCAL_bestGameValue);       //     let positionGameValue = bestGameValue;
+CMP R0,R2;
+BGT calculate__returnCalcValue;                      //     if(!(bestGameValue > 768 - winGameValue) &&
+LD.W R1, (SP + CALCULATE_LOCAL_originPlayerIsInCheck);
+BNE calculate__returnCalcValue;                      //         !originPlayerIsInCheck) {
 
-LD.W R0, #0;
+LD.W R0, #0;                                         //         positionGameValue = 0;
+calculate__returnCalcValue:                          //     }
 ST.W calculate_returnValue, R0;
-include "calculate_return.asm";                      //
+include "calculate_return.asm";                      //     return positionGameValue;
                                                      // }
 
 on_click_return_address: DW;
