@@ -128,7 +128,8 @@ MODE1_CHECK_CAN_MOVE  EQU 1;
 MODE2_CALCULATE_MOVE  EQU 2;
 
 CALCULATE_LOCAL EQU 0;
-CALCULATE_LOCAL_originSquareIndex EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_originSquareValue EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_originSquareIndex EQU CALCULATE_LOCAL_originSquareValue + 2;
 CALCULATE_LOCAL_singlePawnJump EQU CALCULATE_LOCAL_originSquareIndex + 2;
 CALCULATE_LOCAL_winGameValue EQU CALCULATE_LOCAL_singlePawnJump + 2;
 CALCULATE_LOCAL_originPlayerIsInCheck EQU CALCULATE_LOCAL_winGameValue + 2;
@@ -154,6 +155,7 @@ PUSH R0;                                             //     dim originPlayerIsIn
 PUSH R0;                                             //     dim winGameValue;
 PUSH R0;                                             //     dim singlePawnJump;
 PUSH R0;                                             //     dim originSquareIndex;
+PUSH R0;                                             //     dim originSquareValue;
 
 LD.B R0, (SP + CALCULATE_ARG_opponentPieceColor);
 LD.B R1, #PIECE_COLOUR_MASK;
@@ -202,7 +204,11 @@ LD.B R0, #21;
 ST.B (SP + CALCULATE_LOCAL_originSquareIndex), R0;   //     originSquareIndex = 21;
 calculate_forloop_start:                             //     do {
 
-//         let originSquareValue = boardState[originSquareIndex];
+LD.B R2, #boardState;
+ADD R2, R0;
+LD.B R0, (R2);
+ST.B (SP + CALCULATE_LOCAL_originSquareValue), R0;   //         originSquareValue = boardState[originSquareIndex];
+//         
 //         const movedOriginPieceValue = originSquareValue & 0b1111;
 //         const colorlessOriginPieceValue = movedOriginPieceValue ^ originPieceColor; // pawn 1, king 2, knight 3, bishop 4, rook 5, queen 6
 //         const originSquareIsEmpty = originSquareValue === 0;

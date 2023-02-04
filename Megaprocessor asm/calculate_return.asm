@@ -4,4 +4,5 @@ POP R0; // POP CALCULATE_LOCAL_originPlayerIsInCheck
 POP R0; // POP CALCULATE_LOCAL_winGameValue
 POP R0; // POP CALCULATE_LOCAL_singlePawnJump
 POP R0; // POP CALCULATE_LOCAL_originSquareIndex
+POP R0; // POP CALCULATE_LOCAL_originSquareValue
 RET;
