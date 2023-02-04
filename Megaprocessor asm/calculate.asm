@@ -214,9 +214,17 @@ ADD R2, R0;
 LD.B R0, (R2);
 ST.B (SP + CALCULATE_LOCAL_originSquareValue), R0;           //         originSquareValue = boardState[originSquareIndex];
 
-BNE calculate_originSquareValue_notEmpty;                    //         if(originSquareValue !== 0) {
+BNE calculate_originSquareValue_notEmpty;
 JMP calculate_handleOriginPiece_blockEnd;
 calculate_originSquareValue_notEmpty:
+
+LD.B R1,#PIECE_ENUM_OFFBOARD;
+CMP R0,R1;
+BNE calculate_originSquareValue_notOffBoard;
+JMP calculate_handleOriginPiece_blockEnd;
+calculate_originSquareValue_notOffBoard:
+
+                                                             //         if(originSquareValue !== PIECE_ENUM_EMPTY && originSquareValue !== PIECE_ENUM_OFFBOARD) {
 
 LD.B R1, #PIECE_VALUE_MASK;
 AND R1,R0;
