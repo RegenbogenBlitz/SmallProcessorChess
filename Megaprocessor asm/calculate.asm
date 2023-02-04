@@ -214,18 +214,21 @@ ADD R2, R0;
 LD.B R0, (R2);
 ST.B (SP + CALCULATE_LOCAL_originSquareValue), R0;           //         originSquareValue = boardState[originSquareIndex];
 
+BNE calculate_originSquareValue_notEmpty;                    //         if(originSquareValue !== 0) {
+JMP calculate_handleOriginPiece_blockEnd;
+calculate_originSquareValue_notEmpty:
+
 LD.B R1, #PIECE_VALUE_MASK;
 AND R1,R0;
-ST.B (SP + CALCULATE_LOCAL_movedOriginPieceValue), R1;       //         movedOriginPieceValue = originSquareValue & PIECE_VALUE_MASK;
+ST.B (SP + CALCULATE_LOCAL_movedOriginPieceValue), R1;       //             movedOriginPieceValue = originSquareValue & PIECE_VALUE_MASK;
 
 LD.B R2, (SP + CALCULATE_LOCAL_originPieceColor);
 XOR R2,R1;
-ST.B (SP + CALCULATE_LOCAL_colorlessOriginPieceValue), R2;   //         colorlessOriginPieceValue = movedOriginPieceValue ^ originPieceColor; // pawn 1, king 2, knight 3, bishop 4, rook 5, queen 6
+ST.B (SP + CALCULATE_LOCAL_colorlessOriginPieceValue), R2;   //             colorlessOriginPieceValue = movedOriginPieceValue ^ originPieceColor; // pawn 1, king 2, knight 3, bishop 4, rook 5, queen 6
 
-//         const originSquareIsEmpty = originSquareValue === 0;
 //         const originIsPieceOfOwnColorOrEmpty = colorlessOriginPieceValue < 7; // 0: empty, 1-6 own color piece, 7 off-board;
 // 
-//         if (!originSquareIsEmpty && originIsPieceOfOwnColorOrEmpty) {
+//         if (originIsPieceOfOwnColorOrEmpty) {
 //             const originPieceIsOnOriginalSquare = 0b1111 < originSquareValue;
 //             const originPieceIsAPawn = colorlessOriginPieceValue === pawnPieceValue;
 //             const originPieceIsAKing = colorlessOriginPieceValue === kingPieceValue;
@@ -383,7 +386,8 @@ ST.B (SP + CALCULATE_LOCAL_colorlessOriginPieceValue), R2;   //         colorles
 // 
 //             } while (pieceCanSlide || thereAreMoreMoves)
 // 
-//         }
+
+calculate_handleOriginPiece_blockEnd:                        //         }
 
 LD.B R0, (SP + CALCULATE_LOCAL_originSquareIndex);
 INC R0;                                                      //         originSquareIndex++;
