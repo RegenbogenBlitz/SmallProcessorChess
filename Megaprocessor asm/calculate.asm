@@ -214,29 +214,31 @@ ADD R2, R0;
 LD.B R0, (R2);
 ST.B (SP + CALCULATE_LOCAL_originSquareValue), R0;           //         originSquareValue = boardState[originSquareIndex];
 
-BNE calculate_originSquareValue_notEmpty;
+BNE calculate_originSquareValue_notEmpty;                    //         if(     originSquareValue !== PIECE_ENUM_EMPTY && 
 JMP calculate_handleOriginPiece_blockEnd;
 calculate_originSquareValue_notEmpty:
 
 LD.B R1,#PIECE_ENUM_OFFBOARD;
 CMP R0,R1;
-BNE calculate_originSquareValue_notOffBoard;
+BNE calculate_originSquareValue_notOffBoard;                 //                 originSquareValue !== PIECE_ENUM_OFFBOARD &&
 JMP calculate_handleOriginPiece_blockEnd;
 calculate_originSquareValue_notOffBoard:
 
-                                                             //         if(originSquareValue !== PIECE_ENUM_EMPTY && originSquareValue !== PIECE_ENUM_OFFBOARD) {
+LD.B R1, #PIECE_COLOUR_MASK;
+AND R1,R0;
+LD.B R2, (SP + CALCULATE_LOCAL_originPieceColor);
+CMP R1,R2;
+BEQ calculate_originSquareValue_notOriginColor;              //                 (originSquareValue & PIECE_COLOUR_MASK) === originPieceColor) {
+JMP calculate_handleOriginPiece_blockEnd;
+calculate_originSquareValue_notOriginColor:
 
 LD.B R1, #PIECE_VALUE_MASK;
 AND R1,R0;
 ST.B (SP + CALCULATE_LOCAL_movedOriginPieceValue), R1;       //             movedOriginPieceValue = originSquareValue & PIECE_VALUE_MASK;
 
-LD.B R2, (SP + CALCULATE_LOCAL_originPieceColor);
 XOR R2,R1;
 ST.B (SP + CALCULATE_LOCAL_colorlessOriginPieceValue), R2;   //             colorlessOriginPieceValue = movedOriginPieceValue ^ originPieceColor; // pawn 1, king 2, knight 3, bishop 4, rook 5, queen 6
 
-//         const originIsPieceOfOwnColorOrEmpty = colorlessOriginPieceValue < 7; // 0: empty, 1-6 own color piece, 7 off-board;
-// 
-//         if (originIsPieceOfOwnColorOrEmpty) {
 //             const originPieceIsOnOriginalSquare = 0b1111 < originSquareValue;
 //             const originPieceIsAPawn = colorlessOriginPieceValue === pawnPieceValue;
 //             const originPieceIsAKing = colorlessOriginPieceValue === kingPieceValue;
