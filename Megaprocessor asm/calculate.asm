@@ -294,7 +294,17 @@ LD.B R3, #8;
 calculate_originSquareValue_isNot8Directional:
 ST.B (SP + CALCULATE_LOCAL_moveDirectionNumber), R3;             //             moveDirectionNumber = (colorlessOriginPieceValue & 2) ? 8 : 4; // number of move directions: pawn 4, king 8, knight 8, bishop 4, rook 4, queen 8
 
-//             let initialMoveDirectionIndex = movedOriginPieceValue === whitePawnPieceValue ? 10 : initialMoveDirectionIndexes[colorlessOriginPieceValue - 1];
+LD.B R0, #calculate_whitepawn_move_directions;
+LD.B R3, #PIECE_ENUM_WHITE_PAWN;
+CMP R1,R3;
+BEQ calculate_originSquareValue_isWhitePawn;                     //             initialMoveDirectionIndex = movedOriginPieceValue !== PIECE_ENUM_WHITE_PAWN 
+LD.B R3, #-1;
+ADD R3,R2;
+LD.W R2, #calculate_initial_move_direction_indexes;
+ADD R3,R2;
+LD.B R0, (R3);                                                   //                 ? initialMoveDirectionIndexes[colorlessOriginPieceValue - 1];
+calculate_originSquareValue_isWhitePawn:                         //                 : calculate_whitepawn_move_directions
+ST.B (SP + CALCULATE_LOCAL_initialMoveDirectionIndex), R0;
 
 LD.B R0, (SP + CALCULATE_LOCAL_originSquareIndex);
 ST.B (SP + CALCULATE_LOCAL_targetSquareIndex), R0;               //             targetSquareIndex = originSquareIndex;
