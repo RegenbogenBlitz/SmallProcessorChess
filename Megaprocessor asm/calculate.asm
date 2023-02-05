@@ -129,9 +129,7 @@ MODE1_CHECK_CAN_MOVE  EQU 1;
 MODE2_CALCULATE_MOVE  EQU 2;
 
 CALCULATE_LOCAL EQU 0;
-CALCULATE_LOCAL_thereAreMoreMoves EQU CALCULATE_LOCAL;
-CALCULATE_LOCAL_pieceCanSlide EQU CALCULATE_LOCAL_thereAreMoreMoves + 2;
-CALCULATE_LOCAL_targetSquareValue EQU CALCULATE_LOCAL_pieceCanSlide + 2;
+CALCULATE_LOCAL_targetSquareValue EQU CALCULATE_LOCAL;
 CALCULATE_LOCAL_targetSquareIndex EQU CALCULATE_LOCAL_targetSquareValue + 2;
 CALCULATE_LOCAL_initialMoveDirectionIndex EQU CALCULATE_LOCAL_targetSquareIndex + 2;
 CALCULATE_LOCAL_moveDirectionNumber EQU CALCULATE_LOCAL_initialMoveDirectionIndex + 2;
@@ -179,8 +177,6 @@ PUSH R0;                                                         //     dim move
 PUSH R0;                                                         //     dim initialMoveDirectionIndex;
 PUSH R0;                                                         //     dim targetSquareIndex;
 PUSH R0;                                                         //     dim targetSquareValue;
-PUSH R0;                                                         //     dim pieceCanSlide;
-PUSH R0;                                                         //     dim thereAreMoreMoves;
 
 LD.B R0, (SP + CALCULATE_ARG_opponentPieceColor);
 LD.B R1, #PIECE_COLOUR_MASK;
