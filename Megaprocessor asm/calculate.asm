@@ -299,9 +299,10 @@ calculate_originSquareValue_isNot8Directional:
 ST.B (SP + CALCULATE_LOCAL_moveDirectionNumber), R3;             //             moveDirectionNumber = (colorlessOriginPieceValue & 2) ? 8 : 4; // number of move directions: pawn 4, king 8, knight 8, bishop 4, rook 4, queen 8
 
 //             let initialMoveDirectionIndex = movedOriginPieceValue === whitePawnPieceValue ? 10 : initialMoveDirectionIndexes[colorlessOriginPieceValue - 1];
-//             let targetSquareIndex = originSquareIndex;
-//             let pieceCanSlide;
-//             let thereAreMoreMoves;
+
+LD.B R0, (SP + CALCULATE_LOCAL_originSquareIndex);
+ST.B (SP + CALCULATE_LOCAL_targetSquareIndex), R0;               //             targetSquareIndex = originSquareIndex;
+
 //             do {
 // 
 //                 targetSquareIndex += moveDirections[initialMoveDirectionIndex];
