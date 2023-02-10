@@ -1,3 +1,6 @@
+BOOL_FALSE   EQU 0x00;
+BOOL_TRUE    EQU 0xFF;
+
 PIECE_COLOUR_MASK   EQU 0b00001000;
 PIECE_COLOUR_WHITE  EQU 0b00001000;
 PIECE_COLOUR_BLACK  EQU 0b00000000;
@@ -255,34 +258,34 @@ ST.B (SP + CALCULATE_LOCAL_movedOriginPieceValue), R1;           //             
 XOR R2,R1;
 ST.B (SP + CALCULATE_LOCAL_colorlessOriginPieceValue), R2;       //             colorlessOriginPieceValue = movedOriginPieceValue ^ originPieceColor; // pawn 1, king 2, knight 3, bishop 4, rook 5, queen 6
 
-LD.B R3, #0;
+LD.B R3, #BOOL_FALSE;
 CMP R0,R1;
 BEQ calculate_originSquareValue_pieceHasMoved;
-LD.B R3, #0xFF;
+LD.B R3, #BOOL_TRUE;
 calculate_originSquareValue_pieceHasMoved:
 ST.B (SP + CALCULATE_LOCAL_originPieceIsOnOriginalSquare), R3;   //             originPieceIsOnOriginalSquare = (originSquareValue !== movedOriginPieceValue);
 
-LD.B R3, #0;
+LD.B R3, #BOOL_FALSE;
 LD.B R0, #PIECE_ENUM_PAWN;
 CMP R2,R0;
 BNE calculate_originSquareValue_isNotPawn;
-LD.B R3, #0xFF;
+LD.B R3, #BOOL_TRUE;
 calculate_originSquareValue_isNotPawn:
 ST.B (SP + CALCULATE_LOCAL_originPieceIsAPawn), R3;              //             originPieceIsAPawn = (colorlessOriginPieceValue === PIECE_ENUM_PAWN);
 
-LD.B R3, #0;
+LD.B R3, #BOOL_FALSE;
 LD.B R0, #PIECE_ENUM_KING;
 CMP R2,R0;
 BNE calculate_originSquareValue_isNotKing;
-LD.B R3, #0xFF;
+LD.B R3, #BOOL_TRUE;
 calculate_originSquareValue_isNotKing:
 ST.B (SP + CALCULATE_LOCAL_originPieceIsAKing), R3;              //             originPieceIsAKing = (colorlessOriginPieceValue === PIECE_ENUM_KING);
 
-LD.B R3, #0;
+LD.B R3, #BOOL_FALSE;
 LD.B R0, #4;
 CMP R2,R0;
 BLT calculate_originSquareValue_isNotSlidey;
-LD.B R3, #0xFF;
+LD.B R3, #BOOL_TRUE;
 calculate_originSquareValue_isNotSlidey:
 ST.B (SP + CALCULATE_LOCAL_originPieceIsSlidey), R3;             //             originPieceIsSlidey = (colorlessOriginPieceValue >= 4);
 
