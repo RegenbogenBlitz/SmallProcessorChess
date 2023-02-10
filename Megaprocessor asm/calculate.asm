@@ -303,6 +303,7 @@ CMP R1,R3;
 BEQ calculate_originSquareValue_isWhitePawn;                     //             initialMoveDirectionIndex = movedOriginPieceValue !== PIECE_ENUM_WHITE_PAWN 
 LD.B R3, #-1;
 ADD R3,R2;
+ADD R3,R3;  // double as each value is a word
 LD.W R2, #calculate_initial_move_direction_indexes;
 ADD R3,R2;
 LD.B R0, (R3);                                                   //                 ? initialMoveDirectionIndexes[colorlessOriginPieceValue - 1];
