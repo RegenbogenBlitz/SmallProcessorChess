@@ -324,10 +324,9 @@ ST.B (SP + CALCULATE_LOCAL_targetSquareValue), R1;               //             
 //                 let otherSquareOriginIndex = originPieceCouldTakeEnPassant ? enPassantPawnIndex : 0; // index of pawn to be taken en passant
 //                 let otherSquareTargetIndex = otherSquareOriginIndex;
 // 
-//                 const targetIsEmpty = targetSquareValue === 0;
 //                 const targetIsAPieceOfOppositeColor = (1 + (targetSquareValue & 0b1111) ^ originPieceColor) > 9;
 // 
-//                 const theTargetCanBeMovedInto = targetIsEmpty && (!originPieceIsAPawn || moveDirectionNumber <= 2 || originPieceCouldTakeEnPassant);
+//                 const theTargetCanBeMovedInto = (targetSquareValue === PIECE_ENUM_EMPTY) && (!originPieceIsAPawn || moveDirectionNumber <= 2 || originPieceCouldTakeEnPassant);
 //                 const theTargetCanBeTaken = targetIsAPieceOfOppositeColor && (!originPieceIsAPawn || moveDirectionNumber > 2);
 //                 if (theTargetCanBeMovedInto || theTargetCanBeTaken) {
 //                     const targetIsAKing = (targetSquareValue & 0b0111) === kingPieceValue;
@@ -344,7 +343,7 @@ ST.B (SP + CALCULATE_LOCAL_targetSquareValue), R1;               //             
 //                     do {
 //                         const colorlessTargetPieceValue = targetSquareValue & 0b0111
 //                         const targetSquareGameValue = pieceGameValues[colorlessTargetPieceValue];
-//                         const captureGameValueCorrection = targetIsEmpty
+//                         const captureGameValueCorrection = (targetSquareValue === PIECE_ENUM_EMPTY)
 //                             ? 0
 //                             : targetSquareGameValue - depth - colorlessOriginPieceValue + 1;
 //                         // prefer big capture, prefer quick capture, prefer capture by smaller valued piece, prefer capture
@@ -398,7 +397,7 @@ ST.B (SP + CALCULATE_LOCAL_targetSquareValue), R1;               //             
 // 
 //                             castlingIsProhibited = 
 //                                 !originPieceIsAKing || moveDirectionNumber < 7 || otherSquareOriginIndex > 0 ||
-//                                 modeMaxDepth === 0 || !targetIsEmpty || !originPieceIsOnOriginalSquare || calculate(originPieceColor, 0, undefined, 0) > 10000;
+//                                 modeMaxDepth === 0 || !(targetSquareValue === PIECE_ENUM_EMPTY) || !originPieceIsOnOriginalSquare || calculate(originPieceColor, 0, undefined, 0) > 10000;
 // 
 //                             // restore board
 //                             boardState[originSquareIndex] = originSquareValue;
@@ -447,8 +446,8 @@ ST.B (SP + CALCULATE_LOCAL_targetSquareValue), R1;               //             
 //                         }
 //                     } while (canAlsoCastle)
 //                 }
-//                 pieceCanSlide = targetIsEmpty && originPieceIsSlidey;
-//                 const remainingMovesAreValidForPiece = !originPieceIsAPawn || moveDirectionNumber > 2 || (originPieceIsOnOriginalSquare && targetIsEmpty);
+//                 pieceCanSlide = (targetSquareValue === PIECE_ENUM_EMPTY) && originPieceIsSlidey;
+//                 const remainingMovesAreValidForPiece = !originPieceIsAPawn || moveDirectionNumber > 2 || (originPieceIsOnOriginalSquare && (targetSquareValue === PIECE_ENUM_EMPTY));
 // 
 //                 if (!pieceCanSlide) {
 //                     targetSquareIndex = originSquareIndex;
