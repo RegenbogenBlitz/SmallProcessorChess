@@ -12,7 +12,7 @@ POP R0; // POP CALCULATE_LOCAL_originPieceIsAPawn
 POP R0; // POP CALCULATE_LOCAL_originPieceIsAKing
 POP R0; // POP CALCULATE_LOCAL_originPieceIsSlidey
 POP R0; // POP CALCULATE_LOCAL_moveDirectionNumber;
-POP R0; // POP CALCULATE_LOCAL_initialMoveDirectionIndex;
+POP R0; // POP CALCULATE_LOCAL_moveDirectionIndex;
 POP R0; // POP CALCULATE_LOCAL_targetSquareIndex;
 POP R0; // POP CALCULATE_LOCAL_targetSquareValue;
 RET;

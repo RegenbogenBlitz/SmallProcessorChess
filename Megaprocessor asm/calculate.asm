@@ -134,8 +134,8 @@ MODE2_CALCULATE_MOVE  EQU 2;
 CALCULATE_LOCAL EQU 0;
 CALCULATE_LOCAL_targetSquareValue EQU CALCULATE_LOCAL;
 CALCULATE_LOCAL_targetSquareIndex EQU CALCULATE_LOCAL_targetSquareValue + 2;
-CALCULATE_LOCAL_initialMoveDirectionIndex EQU CALCULATE_LOCAL_targetSquareIndex + 2;
-CALCULATE_LOCAL_moveDirectionNumber EQU CALCULATE_LOCAL_initialMoveDirectionIndex + 2;
+CALCULATE_LOCAL_moveDirectionIndex EQU CALCULATE_LOCAL_targetSquareIndex + 2;
+CALCULATE_LOCAL_moveDirectionNumber EQU CALCULATE_LOCAL_moveDirectionIndex + 2;
 CALCULATE_LOCAL_originPieceIsSlidey EQU CALCULATE_LOCAL_moveDirectionNumber + 2;
 CALCULATE_LOCAL_originPieceIsAKing EQU CALCULATE_LOCAL_originPieceIsSlidey + 2;
 CALCULATE_LOCAL_originPieceIsAPawn EQU CALCULATE_LOCAL_originPieceIsAKing + 2;
@@ -177,7 +177,7 @@ PUSH R0;                                                         //     dim orig
 PUSH R0;                                                         //     dim originPieceIsAKing;
 PUSH R0;                                                         //     dim originPieceIsSlidey;
 PUSH R0;                                                         //     dim moveDirectionNumber;
-PUSH R0;                                                         //     dim initialMoveDirectionIndex;
+PUSH R0;                                                         //     dim moveDirectionIndex;
 PUSH R0;                                                         //     dim targetSquareIndex;
 PUSH R0;                                                         //     dim targetSquareValue;
 
@@ -300,7 +300,7 @@ ST.B (SP + CALCULATE_LOCAL_moveDirectionNumber), R3;             //             
 LD.B R0, #calculate_whitepawn_move_directions;
 LD.B R3, #PIECE_ENUM_WHITE_PAWN;
 CMP R1,R3;
-BEQ calculate_originSquareValue_isWhitePawn;                     //             initialMoveDirectionIndex = movedOriginPieceValue !== PIECE_ENUM_WHITE_PAWN 
+BEQ calculate_originSquareValue_isWhitePawn;                     //             moveDirectionIndex = movedOriginPieceValue !== PIECE_ENUM_WHITE_PAWN 
 LD.B R3, #-1;
 ADD R3,R2;
 ADD R3,R3;  // double as each value is a word
@@ -308,14 +308,18 @@ LD.W R2, #calculate_initial_move_direction_indexes;
 ADD R3,R2;
 LD.B R0, (R3);                                                   //                 ? initialMoveDirectionIndexes[colorlessOriginPieceValue - 1];
 calculate_originSquareValue_isWhitePawn:                         //                 : calculate_whitepawn_move_directions
-ST.B (SP + CALCULATE_LOCAL_initialMoveDirectionIndex), R0;
+ST.B (SP + CALCULATE_LOCAL_moveDirectionIndex), R0;
 
 LD.B R0, (SP + CALCULATE_LOCAL_originSquareIndex);
 ST.B (SP + CALCULATE_LOCAL_targetSquareIndex), R0;               //             targetSquareIndex = originSquareIndex;
 
 calculate_more_moves_loop_start:                                 //             do {
-// 
-//                 targetSquareIndex += moveDirections[initialMoveDirectionIndex];
+LD.B R0, (SP + CALCULATE_LOCAL_targetSquareIndex);
+LD.B R2, (SP + CALCULATE_LOCAL_moveDirectionIndex);
+LD.B R1, (R2);
+ADD R0,R2;
+ST.B (SP + CALCULATE_LOCAL_targetSquareIndex), R0;               //                 targetSquareIndex += moveDirections[moveDirectionIndex];
+
 //                 let targetSquareValue = boardState[targetSquareIndex];
 //                 const originPieceCouldTakeEnPassant = originPieceIsAPawn && targetSquareIndex - singlePawnJump === enPassantPawnIndex;
 //                 let otherSquareOriginIndex = originPieceCouldTakeEnPassant ? enPassantPawnIndex : 0; // index of pawn to be taken en passant
@@ -451,7 +455,7 @@ calculate_more_moves_loop_start:                                 //             
 //                     targetSquareIndex = originSquareIndex;
 // 
 //                     if (remainingMovesAreValidForPiece) {
-//                         initialMoveDirectionIndex++;
+//                         moveDirectionIndex++;
 //                         moveDirectionNumber--;
 //                     }
 //                 }
