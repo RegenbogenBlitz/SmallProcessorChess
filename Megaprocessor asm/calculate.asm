@@ -312,7 +312,7 @@ ST.B (SP + CALCULATE_LOCAL_initialMoveDirectionIndex), R0;
 LD.B R0, (SP + CALCULATE_LOCAL_originSquareIndex);
 ST.B (SP + CALCULATE_LOCAL_targetSquareIndex), R0;               //             targetSquareIndex = originSquareIndex;
 
-//             do {
+calculate_more_moves_loop_start:                                 //             do {
 // 
 //                 targetSquareIndex += moveDirections[initialMoveDirectionIndex];
 //                 let targetSquareValue = boardState[targetSquareIndex];
@@ -456,9 +456,11 @@ ST.B (SP + CALCULATE_LOCAL_targetSquareIndex), R0;               //             
 //                 }
 //                 thereAreMoreMoves = remainingMovesAreValidForPiece && moveDirectionNumber !== 0;
 // 
-//             } while (pieceCanSlide || thereAreMoreMoves)
-// 
-
+JMP calculate_more_moves_loop_blockEnd;
+JMP calculate_more_moves_loop_start;
+// TODO TODO TODO TODO TODO                                      //             } while (pieceCanSlide || thereAreMoreMoves)
+calculate_more_moves_loop_blockEnd:
+NOP;
 calculate_handleOriginPiece_blockEnd:                            //         }
 
 LD.B R0, (SP + CALCULATE_LOCAL_originSquareIndex);
