@@ -320,15 +320,27 @@ ADD R2, R1;
 LD.B R1, (R2);
 ST.B (SP + CALCULATE_LOCAL_targetSquareValue), R1;               //                 targetSquareValue = boardState[targetSquareIndex];
 
-//                 const originPieceCouldTakeEnPassant = originPieceIsAPawn && targetSquareIndex - singlePawnJump === enPassantPawnIndex;
-//                 let otherSquareOriginIndex = originPieceCouldTakeEnPassant ? enPassantPawnIndex : 0; // index of pawn to be taken en passant
-//                 let otherSquareTargetIndex = otherSquareOriginIndex;
-// 
-//                 const targetIsAPieceOfOppositeColor = (1 + (targetSquareValue & 0b1111) ^ originPieceColor) > 9;
-// 
-//                 const theTargetCanBeMovedInto = (targetSquareValue === PIECE_ENUM_EMPTY) && (!originPieceIsAPawn || moveDirectionNumber <= 2 || originPieceCouldTakeEnPassant);
-//                 const theTargetCanBeTaken = targetIsAPieceOfOppositeColor && (!originPieceIsAPawn || moveDirectionNumber > 2);
-//                 if (theTargetCanBeMovedInto || theTargetCanBeTaken) {
+//                 let originCanMoveToTarget;
+//                 let otherSquareOriginIndex;
+//                 let otherSquareTargetIndex;
+//                 if(targetSquareValue === PIECE_ENUM_EMPTY)
+//                 {
+//                     const originPieceCouldTakeEnPassant = originPieceIsAPawn && targetSquareIndex - singlePawnJump === enPassantPawnIndex;
+//                     otherSquareOriginIndex = originPieceCouldTakeEnPassant ? enPassantPawnIndex : 0; // index of pawn to be taken en passant
+//                     otherSquareTargetIndex = otherSquareOriginIndex;
+//                     originCanMoveToTarget = !originPieceIsAPawn || moveDirectionNumber <= 2 || originPieceCouldTakeEnPassant;
+//                 }
+//                 else
+//                 {
+//                     otherSquareOriginIndex = 0;
+//                     originCanMoveToTarget = 0;
+//                     const targetIsAPieceOfOppositeColor = (1 + (targetSquareValue & 0b1111) ^ originPieceColor) > 9;
+//                     originCanMoveToTarget = targetIsAPieceOfOppositeColor && (!originPieceIsAPawn || moveDirectionNumber > 2);
+//                 }
+//
+//                 if (originCanMoveToTarget) {
+calculate__origin_can_move_to_target_block_start:
+NOP;
 //                     const targetIsAKing = (targetSquareValue & 0b0111) === kingPieceValue;
 //                     if (targetIsAKing) {
 //                         // previous state was in check
@@ -445,7 +457,10 @@ ST.B (SP + CALCULATE_LOCAL_targetSquareValue), R1;               //             
 //                             canAlsoCastle = rookIsUnmoved && rookAdjacentTargetIsEmpty && kingTargetIsEmpty;
 //                         }
 //                     } while (canAlsoCastle)
-//                 }
+
+calculate__origin_can_move_to_target_block_end:                  //                 }
+NOP;
+
 //                 pieceCanSlide = (targetSquareValue === PIECE_ENUM_EMPTY) && originPieceIsSlidey;
 //                 const remainingMovesAreValidForPiece = !originPieceIsAPawn || moveDirectionNumber > 2 || (originPieceIsOnOriginalSquare && (targetSquareValue === PIECE_ENUM_EMPTY));
 // 
