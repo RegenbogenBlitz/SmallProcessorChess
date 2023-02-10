@@ -315,7 +315,11 @@ LD.B R1, (R2);
 ADD R0,R2;
 ST.B (SP + CALCULATE_LOCAL_targetSquareIndex), R0;               //                 targetSquareIndex += moveDirections[moveDirectionIndex];
 
-//                 let targetSquareValue = boardState[targetSquareIndex];
+LD.B R2, #boardState;
+ADD R2, R1;
+LD.B R1, (R2);
+ST.B (SP + CALCULATE_LOCAL_targetSquareValue), R1;               //                 targetSquareValue = boardState[targetSquareIndex];
+
 //                 const originPieceCouldTakeEnPassant = originPieceIsAPawn && targetSquareIndex - singlePawnJump === enPassantPawnIndex;
 //                 let otherSquareOriginIndex = originPieceCouldTakeEnPassant ? enPassantPawnIndex : 0; // index of pawn to be taken en passant
 //                 let otherSquareTargetIndex = otherSquareOriginIndex;
