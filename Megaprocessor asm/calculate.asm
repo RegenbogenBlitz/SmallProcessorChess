@@ -132,7 +132,9 @@ MODE1_CHECK_CAN_MOVE  EQU 1;
 MODE2_CALCULATE_MOVE  EQU 2;
 
 CALCULATE_LOCAL EQU 0;
-CALCULATE_LOCAL_targetSquareValue EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_otherSquareTargetIndex EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_otherSquareOriginIndex EQU CALCULATE_LOCAL_otherSquareTargetIndex + 2;
+CALCULATE_LOCAL_targetSquareValue EQU CALCULATE_LOCAL_otherSquareOriginIndex + 2;
 CALCULATE_LOCAL_targetSquareIndex EQU CALCULATE_LOCAL_targetSquareValue + 2;
 CALCULATE_LOCAL_moveDirectionIndex EQU CALCULATE_LOCAL_targetSquareIndex + 2;
 CALCULATE_LOCAL_moveDirectionNumber EQU CALCULATE_LOCAL_moveDirectionIndex + 2;
@@ -180,6 +182,8 @@ PUSH R0;                                                         //     dim move
 PUSH R0;                                                         //     dim moveDirectionIndex;
 PUSH R0;                                                         //     dim targetSquareIndex;
 PUSH R0;                                                         //     dim targetSquareValue;
+PUSH R0;                                                         //     dim otherSquareOriginIndex;
+PUSH R0;                                                         //     dim otherSquareTargetIndex;
 
 LD.B R0, (SP + CALCULATE_ARG_opponentPieceColor);
 LD.B R1, #PIECE_COLOUR_MASK;
@@ -320,25 +324,62 @@ ADD R2, R1;
 LD.B R1, (R2);
 ST.B (SP + CALCULATE_LOCAL_targetSquareValue), R1;               //                 targetSquareValue = boardState[targetSquareIndex];
 
-//                 let originCanMoveToTarget;
-//                 let otherSquareOriginIndex;
-//                 let otherSquareTargetIndex;
-//                 if(targetSquareValue === PIECE_ENUM_EMPTY)
-//                 {
-//                     const originPieceCouldTakeEnPassant = originPieceIsAPawn && targetSquareIndex - singlePawnJump === enPassantPawnIndex;
-//                     otherSquareOriginIndex = originPieceCouldTakeEnPassant ? enPassantPawnIndex : 0; // index of pawn to be taken en passant
-//                     otherSquareTargetIndex = otherSquareOriginIndex;
-//                     originCanMoveToTarget = !originPieceIsAPawn || moveDirectionNumber <= 2 || originPieceCouldTakeEnPassant;
-//                 }
-//                 else
-//                 {
-//                     otherSquareOriginIndex = 0;
-//                     originCanMoveToTarget = 0;
-//                     const targetIsAPieceOfOppositeColor = (1 + (targetSquareValue & 0b1111) ^ originPieceColor) > 9;
-//                     originCanMoveToTarget = targetIsAPieceOfOppositeColor && (!originPieceIsAPawn || moveDirectionNumber > 2);
-//                 }
-//
-//                 if (originCanMoveToTarget) {
+LD.B R3, #0;
+ST.B (SP + CALCULATE_LOCAL_otherSquareOriginIndex), R3;          //                 otherSquareOriginIndex = 0;
+ST.B (SP + CALCULATE_LOCAL_otherSquareTargetIndex), R3;          //                 otherSquareTargetIndex = 0;
+
+                                                                 //                 let originCanMoveToTarget;
+BNE calculate__target_not_empty;                                 //                 if(targetSquareValue === PIECE_ENUM_EMPTY) {
+
+LD.B R2, (SP + CALCULATE_LOCAL_originPieceIsAPawn);
+BNE calculate__empty_target_origin_pawn;                         //                     if(!originPieceIsAPawn) {
+
+JMP calculate__origin_can_move_to_target_block_start;            //                         originCanMoveToTarget = true;
+
+calculate__empty_target_origin_pawn:                             //                     } else {
+
+
+LD.B R2, (SP + CALCULATE_LOCAL_singlePawnJump);
+MOVE R3, R0;
+SUB R3,R2;
+LD.B R2, (SP + CALCULATE_ARG_enPassantPawnIndex);
+CMP R3, R2;                                                      //                         const originPieceCouldTakeEnPassant = targetSquareIndex - singlePawnJump === enPassantPawnIndex;
+BNE calculate__cannot_take_enpassant;                            //                         if(originPieceCouldTakeEnPassant) {
+
+ST.B (SP + CALCULATE_LOCAL_otherSquareOriginIndex), R2;          //                             otherSquareOriginIndex = enPassantPawnIndex; // index of pawn to be taken en passant
+ST.B (SP + CALCULATE_LOCAL_otherSquareTargetIndex), R2;          //                             otherSquareTargetIndex = otherSquareOriginIndex;
+JMP calculate__origin_can_move_to_target_block_start;            //                             originCanMoveToTarget = true;
+
+calculate__cannot_take_enpassant:                                 //                         } else {
+LD.B R2, (SP + CALCULATE_LOCAL_moveDirectionNumber);
+LD.B R3, #2;
+CMP R2,R3;
+BLE calculate__origin_can_move_to_target_block_start;            //                             originCanMoveToTarget = moveDirectionNumber <= 2;
+JMP calculate__origin_can_move_to_target_block_end;
+                                                                 //                         }
+                                                                 //                     }
+calculate__target_not_empty:                                     //                 } else {
+
+LD.B R3, #PIECE_COLOUR_MASK;
+AND R3,R1;
+LD.B R2, (SP + CALCULATE_ARG_opponentPieceColor);
+CMP R3,R2;                                                       //                     const targetIsAPieceOfOppositeColor = (targetSquareValue & PIECE_COLOUR_MASK) === opponentPieceColor;
+BNE calculate__non_empty_target_not_opponent;                    //                     if (targetIsAPieceOfOppositeColor) {
+
+LD.B R2, (SP + CALCULATE_LOCAL_originPieceIsAPawn);
+BEQ calculate__origin_can_move_to_target_block_start;            //                         originCanMoveToTarget = !originPieceIsAPawn
+
+LD.B R2, (SP + CALCULATE_LOCAL_moveDirectionNumber);
+LD.B R3, #2;
+CMP R2,R3;
+BGT calculate__origin_can_move_to_target_block_start;            //                             || moveDirectionNumber > 2;
+// Falls through to JMP
+calculate__non_empty_target_not_opponent:                        //                     } else {
+JMP calculate__origin_can_move_to_target_block_end;              //                         originCanMoveToTarget = false;
+                                                                 //                     }
+                                                                 //                 }
+
+                                                                 //                 if (originCanMoveToTarget) {
 calculate__origin_can_move_to_target_block_start:
 NOP;
 //                     const targetIsAKing = (targetSquareValue & 0b0111) === kingPieceValue;
