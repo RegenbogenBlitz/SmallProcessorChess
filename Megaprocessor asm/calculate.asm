@@ -500,26 +500,55 @@ NOP;
 //                     } while (canAlsoCastle)
 
 calculate__origin_can_move_to_target_block_end:                  //                 }
-NOP;
 
-//                 pieceCanSlide = (targetSquareValue === PIECE_ENUM_EMPTY) && originPieceIsSlidey;
-//                 const remainingMovesAreValidForPiece = !originPieceIsAPawn || moveDirectionNumber > 2 || (originPieceIsOnOriginalSquare && (targetSquareValue === PIECE_ENUM_EMPTY));
-// 
-//                 if (!pieceCanSlide) {
-//                     targetSquareIndex = originSquareIndex;
-// 
-//                     if (remainingMovesAreValidForPiece) {
-//                         moveDirectionIndex++;
-//                         moveDirectionNumber--;
-//                     }
-//                 }
-//                 thereAreMoreMoves = remainingMovesAreValidForPiece && moveDirectionNumber !== 0;
-// 
-JMP calculate_more_moves_loop_blockEnd;
-JMP calculate_more_moves_loop_start;
-// TODO TODO TODO TODO TODO                                      //             } while (pieceCanSlide || thereAreMoreMoves)
-calculate_more_moves_loop_blockEnd:
-NOP;
+LD.B R0, (SP + CALCULATE_LOCAL_targetSquareValue);
+BNE calculate__pieceCannotSlide;                                 //                 let pieceCanSlide = (targetSquareValue === PIECE_ENUM_EMPTY)
+
+LD.B R0, (SP + CALCULATE_LOCAL_originPieceIsSlidey);
+BEQ calculate__pieceCannotSlide;                                 //                     && originPieceIsSlidey;
+
+                                                                 //                 let thereAreMoreMoves;
+                                                                 //                 if (pieceCanSlide) {
+JMP calculate_more_moves_loop_start;                             //                     thereAreMoreMoves = true;
+
+calculate__pieceCannotSlide:                                     //                 } else {
+                                                                 //                     thereAreMoreMoves = false;
+
+LD.B R0, (SP + CALCULATE_LOCAL_originSquareIndex);
+ST.B (SP + CALCULATE_LOCAL_targetSquareIndex), R0;               //                     targetSquareIndex = originSquareIndex;
+
+                                                                 //                     const remainingMovesAreValidForPiece = 
+LD.B R0, (SP + CALCULATE_LOCAL_originPieceIsAPawn);
+BEQ calculate__remainingMovesAreValidForPiece;                   //                         !originPieceIsAPawn
+
+LD.B R2, (SP + CALCULATE_LOCAL_moveDirectionNumber);
+LD.B R3, #2;
+CMP R2,R3;
+BGT calculate__remainingMovesAreValidForPiece;                   //                         || moveDirectionNumber > 2
+
+LD.B R0, (SP + CALCULATE_LOCAL_originPieceIsOnOriginalSquare);
+BEQ calculate_handleOriginPiece_blockEnd;                        //                         || (originPieceIsOnOriginalSquare
+
+LD.B R0, (SP + CALCULATE_LOCAL_targetSquareValue);
+BNE calculate_handleOriginPiece_blockEnd;                        //                             && (targetSquareValue === PIECE_ENUM_EMPTY));
+// Falls through to calculate__remainingMovesAreValidForPiece
+
+calculate__remainingMovesAreValidForPiece:                       //                     if (remainingMovesAreValidForPiece) {
+LD.B R0, (SP + CALCULATE_LOCAL_moveDirectionIndex);
+INC R0;
+ST.B (SP + CALCULATE_LOCAL_moveDirectionIndex), R0;              //                         moveDirectionIndex++;
+
+LD.B R0, (SP + CALCULATE_LOCAL_moveDirectionNumber);
+DEC R0;
+ST.B (SP + CALCULATE_LOCAL_moveDirectionNumber), R0;             //                         moveDirectionNumber--;
+
+BEQ calculate_handleOriginPiece_blockEnd;
+JMP calculate_more_moves_loop_start;                             //                         thereAreMoreMoves = moveDirectionNumber !== 0;
+                                                                 //                     }
+                                                                 //                 }
+
+                                                                 //             } while (thereAreMoreMoves)
+
 calculate_handleOriginPiece_blockEnd:                            //         }
 
 LD.B R0, (SP + CALCULATE_LOCAL_originSquareIndex);
