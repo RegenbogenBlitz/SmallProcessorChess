@@ -17,4 +17,5 @@ POP R0; // POP CALCULATE_LOCAL_targetSquareIndex;
 POP R0; // POP CALCULATE_LOCAL_targetSquareValue;
 POP R0; // POP CALCULATE_LOCAL_otherSquareOriginIndex;
 POP R0; // POP CALCULATE_LOCAL_otherSquareTargetIndex;
+POP R0; // POP CALCULATE_LOCAL_targetSquareValueAfterMoving;
 RET;

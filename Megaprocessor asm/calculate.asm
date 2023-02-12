@@ -133,7 +133,8 @@ MODE1_CHECK_CAN_MOVE  EQU 1;
 MODE2_CALCULATE_MOVE  EQU 2;
 
 CALCULATE_LOCAL EQU 0;
-CALCULATE_LOCAL_otherSquareTargetIndex EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_targetSquareValueAfterMoving EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_otherSquareTargetIndex EQU CALCULATE_LOCAL_targetSquareValueAfterMoving + 2;
 CALCULATE_LOCAL_otherSquareOriginIndex EQU CALCULATE_LOCAL_otherSquareTargetIndex + 2;
 CALCULATE_LOCAL_targetSquareValue EQU CALCULATE_LOCAL_otherSquareOriginIndex + 2;
 CALCULATE_LOCAL_targetSquareIndex EQU CALCULATE_LOCAL_targetSquareValue + 2;
@@ -185,6 +186,7 @@ PUSH R0;                                                         //     dim targ
 PUSH R0;                                                         //     dim targetSquareValue;
 PUSH R0;                                                         //     dim otherSquareOriginIndex;
 PUSH R0;                                                         //     dim otherSquareTargetIndex;
+PUSH R0;                                                         //     dim targetSquareValueAfterMoving;
 
 LD.B R0, (SP + CALCULATE_ARG_opponentPieceColor);
 LD.B R1, #PIECE_COLOUR_MASK;
@@ -394,10 +396,31 @@ ST.W calculate_returnValue, R3;
 include "calculate_return.asm";                                  //                         return winGameValue;
 calculate__target_not_king:                                      //                     }
 
-//                     const originPieceWouldBePawnOnLastRank = originPieceIsAPawn && boardState[targetSquareIndex + singlePawnJump] === offBoardValue;
-// 
-//                     const originColorQueenPieceValue = queenPieceValue ^ originPieceColor;
-//                     let targetSquareValueAfterMoving = originPieceWouldBePawnOnLastRank ? originColorQueenPieceValue : movedOriginPieceValue;
+LD.B R3, (SP + CALCULATE_LOCAL_movedOriginPieceValue);
+ST.B (SP + CALCULATE_LOCAL_targetSquareValueAfterMoving), R3;    //                     targetSquareValueAfterMoving = movedOriginPieceValue;
+
+LD.B R2, (SP + CALCULATE_LOCAL_originPieceIsAPawn);
+BEQ calculate__target_not_pawn_promotion;                        //                     if(originPieceIsAPawn) {
+
+LD.B R2, #boardState;
+ADD R2, R0;
+LD.B R3, (SP + CALCULATE_LOCAL_singlePawnJump);
+ADD R2, R3;
+LD.B R0, (R2);
+LD.B R2, #PIECE_ENUM_OFFBOARD;
+CMP R0,R2;
+BNE calculate__target_not_pawn_promotion;                        //                         if(boardState[targetSquareIndex + singlePawnJump] === offBoardValue) {
+
+
+
+LD.B R2, #PIECE_ENUM_QUEEN;
+LD.B R3, (SP + CALCULATE_LOCAL_originPieceColor);
+AND R3,R2;
+ST.B (SP + CALCULATE_LOCAL_targetSquareValueAfterMoving), R3;    //                             targetSquareValueAfterMoving = queenPieceValue ^ originPieceColor;
+                                                                 //                         }
+calculate__target_not_pawn_promotion:                            //                     }
+
+
 //                     let canAlsoCastle;
 //                     do {
 //                         const colorlessTargetPieceValue = targetSquareValue & PIECE_ENUM_MASK
