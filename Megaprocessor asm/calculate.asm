@@ -133,7 +133,8 @@ MODE1_CHECK_CAN_MOVE  EQU 1;
 MODE2_CALCULATE_MOVE  EQU 2;
 
 CALCULATE_LOCAL EQU 0;
-CALCULATE_LOCAL_targetSquareValueAfterMoving EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_moveGameValue EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_targetSquareValueAfterMoving EQU CALCULATE_LOCAL_moveGameValue + 2;
 CALCULATE_LOCAL_otherSquareTargetIndex EQU CALCULATE_LOCAL_targetSquareValueAfterMoving + 2;
 CALCULATE_LOCAL_otherSquareOriginIndex EQU CALCULATE_LOCAL_otherSquareTargetIndex + 2;
 CALCULATE_LOCAL_targetSquareValue EQU CALCULATE_LOCAL_otherSquareOriginIndex + 2;
@@ -187,6 +188,7 @@ PUSH R0;                                                         //     dim targ
 PUSH R0;                                                         //     dim otherSquareOriginIndex;
 PUSH R0;                                                         //     dim otherSquareTargetIndex;
 PUSH R0;                                                         //     dim targetSquareValueAfterMoving;
+PUSH R0;                                                         //     dim moveGameValue;
 
 LD.B R0, (SP + CALCULATE_ARG_opponentPieceColor);
 LD.B R1, #PIECE_COLOUR_MASK;
@@ -400,7 +402,7 @@ LD.B R3, (SP + CALCULATE_LOCAL_movedOriginPieceValue);
 ST.B (SP + CALCULATE_LOCAL_targetSquareValueAfterMoving), R3;    //                     targetSquareValueAfterMoving = movedOriginPieceValue;
 
 LD.B R2, (SP + CALCULATE_LOCAL_originPieceIsAPawn);
-BEQ calculate__target_not_pawn_promotion;                        //                     if(originPieceIsAPawn) {
+BEQ calculate__makeMove_loop_start;                              //                     if(originPieceIsAPawn) {
 
 LD.W R2, #boardState;
 ADD R2, R0;
@@ -409,27 +411,35 @@ ADD R2, R3;
 LD.B R0, (R2);
 LD.B R2, #PIECE_ENUM_OFFBOARD;
 CMP R0,R2;
-BNE calculate__target_not_pawn_promotion;                        //                         if(boardState[targetSquareIndex + singlePawnJump] === offBoardValue) {
-
-
+BNE calculate__makeMove_loop_start;                              //                         if(boardState[targetSquareIndex + singlePawnJump] === offBoardValue) {
 
 LD.B R2, #PIECE_ENUM_QUEEN;
 LD.B R3, (SP + CALCULATE_LOCAL_originPieceColor);
 AND R3,R2;
 ST.B (SP + CALCULATE_LOCAL_targetSquareValueAfterMoving), R3;    //                             targetSquareValueAfterMoving = queenPieceValue ^ originPieceColor;
                                                                  //                         }
-calculate__target_not_pawn_promotion:                            //                     }
+                                                                 //                     }
 
+calculate__makeMove_loop_start:                                  //                     do {
 
-//                     let canAlsoCastle;
-//                     do {
-//                         const colorlessTargetPieceValue = targetSquareValue & PIECE_ENUM_MASK
-//                         const targetSquareGameValue = pieceGameValues[colorlessTargetPieceValue];
-//                         const captureGameValueCorrection = (targetSquareValue === PIECE_ENUM_EMPTY)
-//                             ? 0
-//                             : targetSquareGameValue - depth - colorlessOriginPieceValue + 1;
-//                         // prefer big capture, prefer quick capture, prefer capture by smaller valued piece, prefer capture
-// 
+LD.B R1, #0;                                                     //                         moveGameValue = 0;
+LD.B R3, (SP + CALCULATE_LOCAL_targetSquareValue);
+BEQ calculate__target_is_empty;                                  //                         if(targetSquareValue === PIECE_ENUM_EMPTY) {
+                                                                 //                         {
+LD.B R2, #PIECE_ENUM_MASK;
+AND R3,R2;                                                       //                             const colorlessTargetPieceValue = targetSquareValue & PIECE_ENUM_MASK;
+LD.W R2, #calculate_piece_game_values;
+ADD R2,R3;
+LD.B R1,(R2);                                                    //                             const targetSquareGameValue = pieceGameValues[colorlessTargetPieceValue];
+LD.B R2, (SP + CALCULATE_ARG_depth);
+SUB R1,R2;
+LD.B R2, (SP + CALCULATE_LOCAL_colorlessOriginPieceValue);
+SUB R1,R2;//                                                     //                             // prefer big capture, prefer quick capture, prefer capture by smaller valued piece, prefer capture
+INC R1;                                                          //                             moveGameValue = targetSquareGameValue - depth - colorlessOriginPieceValue + 1;
+
+calculate__target_is_empty:                                      //                         }
+ST.B (SP + CALCULATE_LOCAL_moveGameValue), R1;                   //
+
 //                         let pawnMoveGameValueCorrection = 0;
 //                         if (originPieceIsAPawn) {
 //                             const pawnPromoted = targetSquareValueAfterMoving > originSquareValue & 0b1111;
@@ -448,7 +458,7 @@ calculate__target_not_pawn_promotion:                            //             
 //                         }
 // 
 //                         let castlingIsProhibited = true;
-//                         let moveGameValue = captureGameValueCorrection + pawnMoveGameValueCorrection;
+//                         let moveGameValue += pawnMoveGameValueCorrection;
 //                         if (modeMaxDepth > depth || (modeMaxDepth === 2 && modeMaxDepth === depth && (moveGameValue > 2 || originPlayerIsInCheck))) {
 //                             boardState[targetSquareIndex] = targetSquareValueAfterMoving;
 //                             boardState[otherSquareTargetIndex] = boardState[otherSquareOriginIndex];
@@ -512,7 +522,8 @@ calculate__target_not_pawn_promotion:                            //             
 //                                 }
 //                             }
 //                         }
-// 
+//
+//                         let canAlsoCastle;
 //                         if (castlingIsProhibited || originPlayerIsInCheck) {
 //                             canAlsoCastle = false;
 //                         } else {
