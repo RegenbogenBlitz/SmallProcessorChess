@@ -8,6 +8,7 @@ PIECE_COLOUR_BLACK  EQU 0b00000000;
 UNMOVED_PIECE       EQU 0b00110000;
 PIECE_VALUE_MASK    EQU 0b00001111;
 
+PIECE_ENUM_MASK     EQU 0b00000111;
 PIECE_ENUM_EMPTY    EQU 0b00000000;
 PIECE_ENUM_PAWN     EQU 0b00000001;
 PIECE_ENUM_KING     EQU 0b00000010;
@@ -381,20 +382,25 @@ JMP calculate__origin_can_move_to_target_block_end;              //             
 
                                                                  //                 if (originCanMoveToTarget) {
 calculate__origin_can_move_to_target_block_start:
-NOP;
-//                     const targetIsAKing = (targetSquareValue & 0b0111) === kingPieceValue;
-//                     if (targetIsAKing) {
-//                         // previous state was in check
-//                         return winGameValue;
-//                     }
-// 
+
+LD.B R2, #PIECE_ENUM_MASK;
+AND R2, R1;
+LD.B R3, #PIECE_ENUM_KING;
+CMP R2,R3;                                                       //                     const targetIsAKing = (targetSquareValue & PIECE_ENUM_MASK) === PIECE_ENUM_KING;
+BNE calculate__target_not_king;                                  //                     if (targetIsAKing) {
+                                                                 //                         // previous state was in check
+LD.W R3, (SP + CALCULATE_LOCAL_winGameValue);
+ST.W calculate_returnValue, R3;
+include "calculate_return.asm";                                  //                         return winGameValue;
+calculate__target_not_king:                                      //                     }
+
 //                     const originPieceWouldBePawnOnLastRank = originPieceIsAPawn && boardState[targetSquareIndex + singlePawnJump] === offBoardValue;
 // 
 //                     const originColorQueenPieceValue = queenPieceValue ^ originPieceColor;
 //                     let targetSquareValueAfterMoving = originPieceWouldBePawnOnLastRank ? originColorQueenPieceValue : movedOriginPieceValue;
 //                     let canAlsoCastle;
 //                     do {
-//                         const colorlessTargetPieceValue = targetSquareValue & 0b0111
+//                         const colorlessTargetPieceValue = targetSquareValue & PIECE_ENUM_MASK
 //                         const targetSquareGameValue = pieceGameValues[colorlessTargetPieceValue];
 //                         const captureGameValueCorrection = (targetSquareValue === PIECE_ENUM_EMPTY)
 //                             ? 0
