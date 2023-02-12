@@ -235,7 +235,7 @@ LD.B R0, #21;
 ST.B (SP + CALCULATE_LOCAL_originSquareIndex), R0;               //     originSquareIndex = 21;
 calculate_forloop_start:                                         //     do {
 
-LD.B R2, #boardState;
+LD.W R2, #boardState;
 ADD R2, R0;
 LD.B R0, (R2);
 ST.B (SP + CALCULATE_LOCAL_originSquareValue), R0;               //         originSquareValue = boardState[originSquareIndex];
@@ -309,20 +309,20 @@ ADD R3,R1;
 ADD R3,R3;  // double as each value is a word
 LD.W R2, #calculate_initial_move_direction_indexes;
 ADD R3,R2;
-LD.B R0, (R3);
-ST.B (SP + CALCULATE_LOCAL_moveDirectionIndex), R0;              //             moveDirectionIndex = initialMoveDirectionIndexes[movedOriginPieceValue - 1];
+LD.W R0, (R3);
+ST.W (SP + CALCULATE_LOCAL_moveDirectionIndex), R0;              //             moveDirectionIndex = initialMoveDirectionIndexes[movedOriginPieceValue - 1];
 
 LD.B R0, (SP + CALCULATE_LOCAL_originSquareIndex);
 ST.B (SP + CALCULATE_LOCAL_targetSquareIndex), R0;               //             targetSquareIndex = originSquareIndex;
 
 calculate_more_moves_loop_start:                                 //             do {
 LD.B R0, (SP + CALCULATE_LOCAL_targetSquareIndex);
-LD.B R2, (SP + CALCULATE_LOCAL_moveDirectionIndex);
+LD.W R2, (SP + CALCULATE_LOCAL_moveDirectionIndex);
 LD.B R1, (R2);
 ADD R0,R2;
 ST.B (SP + CALCULATE_LOCAL_targetSquareIndex), R0;               //                 targetSquareIndex += moveDirections[moveDirectionIndex];
 
-LD.B R2, #boardState;
+LD.W R2, #boardState;
 ADD R2, R1;
 LD.B R1, (R2);
 ST.B (SP + CALCULATE_LOCAL_targetSquareValue), R1;               //                 targetSquareValue = boardState[targetSquareIndex];
@@ -402,7 +402,7 @@ ST.B (SP + CALCULATE_LOCAL_targetSquareValueAfterMoving), R3;    //             
 LD.B R2, (SP + CALCULATE_LOCAL_originPieceIsAPawn);
 BEQ calculate__target_not_pawn_promotion;                        //                     if(originPieceIsAPawn) {
 
-LD.B R2, #boardState;
+LD.W R2, #boardState;
 ADD R2, R0;
 LD.B R3, (SP + CALCULATE_LOCAL_singlePawnJump);
 ADD R2, R3;
@@ -612,7 +612,7 @@ ST.W on_click_return_address, R0;                                //
 LD.B R0, global_cursor_square_index;                             //
 ST.B calculate_clickedBoardIndex, R0;                            //     calculate_clickedBoardIndex = global_cursor_square_index;
                                                                  //
-LD.B R2, #boardState;                                            //
+LD.W R2, #boardState;                                            //
 ADD R2,R0;                                                       //
 LD.B R1, (R2);                                                   //     const clickedBoardState = boardState[calculate_clickedBoardIndex];
 LD.B R3, #PIECE_COLOUR_WHITE;                                    //
