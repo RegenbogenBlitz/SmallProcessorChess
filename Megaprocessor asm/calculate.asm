@@ -20,13 +20,14 @@ PIECE_ENUM_OFFBOARD EQU 0b00000111;
 
 PIECE_ENUM_WHITE_PAWN EQU PIECE_COLOUR_WHITE + PIECE_ENUM_PAWN;
 
-PIECE_GAMEVALUE_EMPTY EQU 0;
-PIECE_GAMEVALUE_PAWN EQU 14;
-PIECE_GAMEVALUE_KING EQU 0;
-PIECE_GAMEVALUE_KNIGHT EQU 40;
-PIECE_GAMEVALUE_BISHOP EQU 38;
-PIECE_GAMEVALUE_ROOK EQU 68;
-PIECE_GAMEVALUE_QUEEN EQU 124;
+PIECE_GAMEVALUE_EMPTY           EQU 0;
+PIECE_GAMEVALUE_PAWN            EQU 14;
+PIECE_GAMEVALUE_KING            EQU 0;
+PIECE_GAMEVALUE_KNIGHT          EQU 40;
+PIECE_GAMEVALUE_BISHOP          EQU 38;
+PIECE_GAMEVALUE_ROOK            EQU 68;
+PIECE_GAMEVALUE_QUEEN           EQU 124;
+PIECE_GAMEVALUE_QUEEN_PAWN_DIFF EQU PIECE_GAMEVALUE_QUEEN - PIECE_GAMEVALUE_PAWN;
 
 calculate_piece_game_values:
 DB PIECE_GAMEVALUE_EMPTY;
@@ -434,31 +435,49 @@ LD.B R1,(R2);                                                    //             
 LD.B R2, (SP + CALCULATE_ARG_depth);
 SUB R1,R2;
 LD.B R2, (SP + CALCULATE_LOCAL_colorlessOriginPieceValue);
-SUB R1,R2;//                                                     //                             // prefer big capture, prefer quick capture, prefer capture by smaller valued piece, prefer capture
+SUB R1,R2;                                                       //                             // prefer big capture, prefer quick capture, prefer capture by smaller valued piece, prefer capture
 INC R1;                                                          //                             moveGameValue = targetSquareGameValue - depth - colorlessOriginPieceValue + 1;
 
 calculate__target_is_empty:                                      //                         }
-ST.B (SP + CALCULATE_LOCAL_moveGameValue), R1;                   //
 
-//                         let pawnMoveGameValueCorrection = 0;
-//                         if (originPieceIsAPawn) {
-//                             const pawnPromoted = targetSquareValueAfterMoving > originSquareValue & 0b1111;
-//                             const pawnTookEnPassant = otherSquareOriginIndex !== 0;
-//                             const pawnMovedForwardTwo = moveDirectionNumber <= 1
-//                             if (pawnPromoted) {
-//                                 pawnMoveGameValueCorrection = queenGameValue - pawnGameValue;
-//                             } else if (pawnTookEnPassant) {
-//                                 pawnMoveGameValueCorrection = pawnGameValue + 1;
-//                             } else if (pawnMovedForwardTwo) {
-//                                 pawnMoveGameValueCorrection = 2;
-//                             }
-//                             else {
-//                                 pawnMoveGameValueCorrection = 1;
-//                             }
-//                         }
-// 
+LD.B R2, (SP + CALCULATE_LOCAL_originPieceIsAPawn);
+BEQ calculate__set_moveGameValue;                                //                         if (originPieceIsAPawn) {
+
+LD.B R2, (SP + CALCULATE_LOCAL_moveDirectionNumber);
+DEC R2;                                                          //                             const pawnMovedForwardTwo = moveDirectionNumber <= 1
+BGT calculate__not_pawn_double_move;                             //                             if(pawnMovedForwardTwo) {
+
+ADDQ R1, #2;                                                     //                                  moveGameValue += 2;
+JMP calculate__set_moveGameValue;
+calculate__not_pawn_double_move:                                 //                             } else {
+
+LD.B R2, (SP + CALCULATE_LOCAL_targetSquareValueAfterMoving);
+LD.B R3, (SP + CALCULATE_LOCAL_movedOriginPieceValue);
+CMP R2,R3;                                                       //                                 const pawnPromoted = targetSquareValueAfterMoving > movedOriginPieceValue;
+BLE calculate__not_pawn_promoted;                                //                                 if (pawnPromoted) {
+
+LD.B R3, #PIECE_GAMEVALUE_QUEEN_PAWN_DIFF;
+ADD R1,R3;                                                       //                                     moveGameValue += PIECE_GAMEVALUE_QUEEN - PIECE_GAMEVALUE_PAWN;
+JMP calculate__set_moveGameValue;
+calculate__not_pawn_promoted:                                    //                                 } else {
+
+LD.B R2, (SP + CALCULATE_LOCAL_otherSquareOriginIndex);          //                                     const pawnTookEnPassant = otherSquareOriginIndex !== 0;
+BEQ calculate__not_pawn_took_enpassant;                          //                                     if (pawnTookEnPassant) {
+
+LD.B R2, #PIECE_GAMEVALUE_PAWN;
+ADD R1,R2;                                                       //                                         moveGameValue += pawnGameValue + 1;
+// Falls through to also INC
+
+calculate__not_pawn_took_enpassant:                              //                                     } else {
+INC R1;                                                          //                                         moveGameValue += 1;
+                                                                 //                                     }
+                                                                 //                                 }
+                                                                 //                             }
+
+calculate__set_moveGameValue:                                    //                         }
+ST.W (SP + CALCULATE_LOCAL_moveGameValue), R1;
+
 //                         let castlingIsProhibited = true;
-//                         let moveGameValue += pawnMoveGameValueCorrection;
 //                         if (modeMaxDepth > depth || (modeMaxDepth === 2 && modeMaxDepth === depth && (moveGameValue > 2 || originPlayerIsInCheck))) {
 //                             boardState[targetSquareIndex] = targetSquareValueAfterMoving;
 //                             boardState[otherSquareTargetIndex] = boardState[otherSquareOriginIndex];
