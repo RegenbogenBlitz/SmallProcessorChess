@@ -516,15 +516,23 @@ LD.B R3, (SP + CALCULATE_LOCAL_otherSquareOriginIndex);
 ADD R2,R3;
 LD.B R1, (R2);
 LD.W R2, #boardState;
-LD.B R3, (SP + CALCULATE_LOCAL_otherSquareTargetIndex);
-ADD R2,R3;
+LD.B R0, (SP + CALCULATE_LOCAL_otherSquareTargetIndex);
+ADD R2,R0;
 ST.B (R2), R1;                                                   //                             boardState[otherSquareTargetIndex] = boardState[otherSquareOriginIndex];
 
-//                             if (otherSquareOriginIndex) {
-//                                 boardState[otherSquareOriginIndex] = 0;
-//                             }
-//                             boardState[originSquareIndex] = 0;
-// 
+TEST R3;
+BNE calculate__otherSquareOriginIndexNotSet;                     //                             if (otherSquareOriginIndex) {
+
+LD.W R2, #boardState;
+ADD R3,R2;
+LD.W R1, #PIECE_ENUM_EMPTY;
+ST.B (R3), R1;                                                   //                                 boardState[otherSquareOriginIndex] = PIECE_ENUM_EMPTY;
+calculate__otherSquareOriginIndexNotSet:                         //                             }
+
+LD.B R0, (SP + CALCULATE_LOCAL_originSquareIndex);
+ADD R2,R0;
+ST.B (R2), R1;                                                   //                             boardState[originSquareIndex] = PIECE_ENUM_EMPTY;
+
 //                             const pawnJustMovedTwoSpaces = originPieceIsAPawn && moveDirectionNumber <= 1;
 //                             const justMovedEnPassantPawnIndex = pawnJustMovedTwoSpaces ? targetSquareIndex : 0;
 // 
