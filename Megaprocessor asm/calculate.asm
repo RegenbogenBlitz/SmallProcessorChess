@@ -509,7 +509,15 @@ ADD R2,R3;
 LD.B R1, (SP + CALCULATE_LOCAL_targetSquareValueAfterMoving);
 ST.B (R2), R1;                                                   //                             boardState[targetSquareIndex] = targetSquareValueAfterMoving;
 
-//                             boardState[otherSquareTargetIndex] = boardState[otherSquareOriginIndex];
+LD.W R2, #boardState;
+LD.B R3, (SP + CALCULATE_LOCAL_otherSquareOriginIndex);
+ADD R2,R3;
+LD.B R1, (R2);
+LD.W R2, #boardState;
+LD.B R3, (SP + CALCULATE_LOCAL_otherSquareTargetIndex);
+ADD R2,R3;
+ST.B (R2), R1;                                                   //                             boardState[otherSquareTargetIndex] = boardState[otherSquareOriginIndex];
+
 //                             if (otherSquareOriginIndex) {
 //                                 boardState[otherSquareOriginIndex] = 0;
 //                             }
