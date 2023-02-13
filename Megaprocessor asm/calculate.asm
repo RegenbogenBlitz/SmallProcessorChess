@@ -201,7 +201,7 @@ ST.B (SP + CALCULATE_LOCAL_originPieceColor), R1;                //     originPi
 LD.W R0, #-32768;
 ST.W (SP + CALCULATE_LOCAL_bestGameValue), R1;                   //     bestGameValue = -32768;
 
-LD.B R0, #0;
+LD.B R0, #BOOL_FALSE;
 ST.B (SP + CALCULATE_LOCAL_originPlayerIsInCheck), R0;
 LD.B R0, (SP + CALCULATE_ARG_modeMaxDepth);
 BNE calculate_originPlayerIsInCheck_notModeZero;                 //     if(modeMaxDepth == 0) {
@@ -479,9 +479,29 @@ INC R1;                                                          //             
 calculate__set_moveGameValue:                                    //                         }
 ST.W (SP + CALCULATE_LOCAL_moveGameValue), R1;
 
-LD.B R1, #BOOL_TRUE;
-ST.W (SP + CALCULATE_LOCAL_castlingIsProhibited), R1;            //                         castlingIsProhibited = true;
-//                         if (modeMaxDepth > depth || (modeMaxDepth === 2 && modeMaxDepth === depth && (moveGameValue > 2 || originPlayerIsInCheck))) {
+LD.B R0, #BOOL_TRUE;
+ST.W (SP + CALCULATE_LOCAL_castlingIsProhibited), R0;            //                         castlingIsProhibited = true;
+
+LD.B R2, (SP + CALCULATE_LOCAL_modeMaxDepth);
+LD.B R3, (SP + CALCULATE_ARG_depth);
+CMP R2,R3;
+BGT calculate__can_go_deeper;                                    //                         if (modeMaxDepth > depth ||
+
+LD.B R0, #2;
+CMP R2,R0;
+BNE calculate__cannot_go_deeper;                                 //                             (modeMaxDepth === 2 &&
+
+CMP R2,R3;
+BNE calculate__cannot_go_deeper;                                 //                             modeMaxDepth === depth &&
+
+CMP R1,R0;
+BGT calculate__can_go_deeper;                                    //                             (moveGameValue > 2 ||
+
+LD.B R2, (SP + CALCULATE_LOCAL_originPlayerIsInCheck);
+BEQ calculate__cannot_go_deeper;                                 //                             originPlayerIsInCheck))) {
+// Falls through
+
+calculate__can_go_deeper:
 //                             boardState[targetSquareIndex] = targetSquareValueAfterMoving;
 //                             boardState[otherSquareTargetIndex] = boardState[otherSquareOriginIndex];
 //                             if (otherSquareOriginIndex) {
@@ -529,7 +549,7 @@ ST.W (SP + CALCULATE_LOCAL_castlingIsProhibited), R1;            //             
 //                                 }
 // 
 //                             }
-//                         }
+calculate__cannot_go_deeper:                                     //                         }
 //                         if (moveGameValue > bestGameValue || (depth === 0 && moveGameValue == bestGameValue && Math.random() < .5)) {
 //                             bestGameValue = moveGameValue;
 //                             if (modeMaxDepth === 2) {
