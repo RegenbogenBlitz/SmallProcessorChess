@@ -502,7 +502,13 @@ BEQ calculate__cannot_go_deeper;                                 //             
 // Falls through
 
 calculate__can_go_deeper:
-//                             boardState[targetSquareIndex] = targetSquareValueAfterMoving;
+
+LD.W R2, #boardState;
+LD.B R3, (SP + CALCULATE_LOCAL_targetSquareIndex);
+ADD R2,R3;
+LD.B R1, (SP + CALCULATE_LOCAL_targetSquareValueAfterMoving);
+ST.B (R2), R1;                                                   //                             boardState[targetSquareIndex] = targetSquareValueAfterMoving;
+
 //                             boardState[otherSquareTargetIndex] = boardState[otherSquareOriginIndex];
 //                             if (otherSquareOriginIndex) {
 //                                 boardState[otherSquareOriginIndex] = 0;
