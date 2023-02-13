@@ -482,7 +482,7 @@ ST.W (SP + CALCULATE_LOCAL_moveGameValue), R1;
 LD.B R0, #BOOL_TRUE;
 ST.W (SP + CALCULATE_LOCAL_castlingIsProhibited), R0;            //                         castlingIsProhibited = true;
 
-LD.B R2, (SP + CALCULATE_LOCAL_modeMaxDepth);
+LD.B R2, (SP + CALCULATE_ARG_modeMaxDepth);
 LD.B R3, (SP + CALCULATE_ARG_depth);
 CMP R2,R3;
 BGT calculate__can_go_deeper;                                    //                         if (modeMaxDepth > depth ||
@@ -498,8 +498,10 @@ CMP R1,R0;
 BGT calculate__can_go_deeper;                                    //                             (moveGameValue > 2 ||
 
 LD.B R2, (SP + CALCULATE_LOCAL_originPlayerIsInCheck);
-BEQ calculate__cannot_go_deeper;                                 //                             originPlayerIsInCheck))) {
-// Falls through
+BNE calculate__can_go_deeper;                                    //                             originPlayerIsInCheck))) {
+
+calculate__cannot_go_deeper:
+JMP calculate__can_go_deeper_blockend;
 
 calculate__can_go_deeper:
 
@@ -563,7 +565,8 @@ ST.B (R2), R1;                                                   //             
 //                                 }
 // 
 //                             }
-calculate__cannot_go_deeper:                                     //                         }
+calculate__can_go_deeper_blockend:                               //                         }
+NOP;
 //                         if (moveGameValue > bestGameValue || (depth === 0 && moveGameValue == bestGameValue && Math.random() < .5)) {
 //                             bestGameValue = moveGameValue;
 //                             if (modeMaxDepth === 2) {
