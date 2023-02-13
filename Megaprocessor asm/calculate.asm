@@ -134,7 +134,8 @@ MODE1_CHECK_CAN_MOVE  EQU 1;
 MODE2_CALCULATE_MOVE  EQU 2;
 
 CALCULATE_LOCAL EQU 0;
-CALCULATE_LOCAL_moveGameValue EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_castlingIsProhibited EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_moveGameValue EQU CALCULATE_LOCAL_castlingIsProhibited + 2;
 CALCULATE_LOCAL_targetSquareValueAfterMoving EQU CALCULATE_LOCAL_moveGameValue + 2;
 CALCULATE_LOCAL_otherSquareTargetIndex EQU CALCULATE_LOCAL_targetSquareValueAfterMoving + 2;
 CALCULATE_LOCAL_otherSquareOriginIndex EQU CALCULATE_LOCAL_otherSquareTargetIndex + 2;
@@ -190,6 +191,7 @@ PUSH R0;                                                         //     dim othe
 PUSH R0;                                                         //     dim otherSquareTargetIndex;
 PUSH R0;                                                         //     dim targetSquareValueAfterMoving;
 PUSH R0;                                                         //     dim moveGameValue;
+PUSH R0;                                                         //     dim castlingIsProhibited;
 
 LD.B R0, (SP + CALCULATE_ARG_opponentPieceColor);
 LD.B R1, #PIECE_COLOUR_MASK;
@@ -477,7 +479,8 @@ INC R1;                                                          //             
 calculate__set_moveGameValue:                                    //                         }
 ST.W (SP + CALCULATE_LOCAL_moveGameValue), R1;
 
-//                         let castlingIsProhibited = true;
+LD.B R1, #BOOL_TRUE;
+ST.W (SP + CALCULATE_LOCAL_castlingIsProhibited), R1;            //                         castlingIsProhibited = true;
 //                         if (modeMaxDepth > depth || (modeMaxDepth === 2 && modeMaxDepth === depth && (moveGameValue > 2 || originPlayerIsInCheck))) {
 //                             boardState[targetSquareIndex] = targetSquareValueAfterMoving;
 //                             boardState[otherSquareTargetIndex] = boardState[otherSquareOriginIndex];

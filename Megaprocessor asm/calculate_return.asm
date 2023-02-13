@@ -19,5 +19,6 @@ POP R0; // POP CALCULATE_LOCAL_otherSquareOriginIndex;
 POP R0; // POP CALCULATE_LOCAL_otherSquareTargetIndex;
 POP R0; // POP CALCULATE_LOCAL_targetSquareValueAfterMoving;
 POP R0; // POP CALCULATE_LOCAL_moveGameValue;
+POP R0; // POP CALCULATE_LOCAL_castlingIsProhibited;
 
 RET;
