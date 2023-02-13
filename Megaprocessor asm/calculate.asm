@@ -134,7 +134,8 @@ MODE1_CHECK_CAN_MOVE  EQU 1;
 MODE2_CALCULATE_MOVE  EQU 2;
 
 CALCULATE_LOCAL EQU 0;
-CALCULATE_LOCAL_castlingIsProhibited EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_justMovedEnPassantPawnIndex EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_castlingIsProhibited EQU CALCULATE_LOCAL_justMovedEnPassantPawnIndex + 2;
 CALCULATE_LOCAL_moveGameValue EQU CALCULATE_LOCAL_castlingIsProhibited + 2;
 CALCULATE_LOCAL_targetSquareValueAfterMoving EQU CALCULATE_LOCAL_moveGameValue + 2;
 CALCULATE_LOCAL_otherSquareTargetIndex EQU CALCULATE_LOCAL_targetSquareValueAfterMoving + 2;
@@ -192,6 +193,7 @@ PUSH R0;                                                         //     dim othe
 PUSH R0;                                                         //     dim targetSquareValueAfterMoving;
 PUSH R0;                                                         //     dim moveGameValue;
 PUSH R0;                                                         //     dim castlingIsProhibited;
+PUSH R0;                                                         //     dim justMovedEnPassantPawnIndex;
 
 LD.B R0, (SP + CALCULATE_ARG_opponentPieceColor);
 LD.B R1, #PIECE_COLOUR_MASK;
@@ -533,9 +535,22 @@ LD.B R0, (SP + CALCULATE_LOCAL_originSquareIndex);
 ADD R2,R0;
 ST.B (R2), R1;                                                   //                             boardState[originSquareIndex] = PIECE_ENUM_EMPTY;
 
-//                             const pawnJustMovedTwoSpaces = originPieceIsAPawn && moveDirectionNumber <= 1;
-//                             const justMovedEnPassantPawnIndex = pawnJustMovedTwoSpaces ? targetSquareIndex : 0;
-// 
+
+LD.B R0, #0;                                                     //                             justMovedEnPassantPawnIndex = 0;
+
+LD.B R1, (SP + CALCULATE_LOCAL_originPieceIsAPawn);
+BEQ calculate__pawnDidNotJustMoveTwoSpaces;                      //                             if(originPieceIsAPawn && 
+
+LD.B R1, (SP + CALCULATE_LOCAL_moveDirectionNumber);
+LD.B R2, #1;
+CMP R1,R2;
+BGT calculate__pawnDidNotJustMoveTwoSpaces;                      //                                 moveDirectionNumber <= 1) {
+
+LD.B R0, (SP + CALCULATE_LOCAL_targetSquareIndex);               //                                 justMovedEnPassantPawnIndex = targetSquareIndex;
+calculate__pawnDidNotJustMoveTwoSpaces:                          //                             }
+
+ST.B (SP + CALCULATE_LOCAL_justMovedEnPassantPawnIndex), R0;
+
 //                             const maxOpponentGameValueThatAvoidsPruning = moveGameValue - bestGameValue;
 //                             const opponentMoveGameValue = calculate(originPieceColor, depth + 1, justMovedEnPassantPawnIndex, modeMaxDepth, maxOpponentGameValueThatAvoidsPruning);
 //                             const correctedMoveGameValue = moveGameValue - opponentMoveGameValue;
