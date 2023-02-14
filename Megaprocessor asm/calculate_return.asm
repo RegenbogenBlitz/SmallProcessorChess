@@ -1,5 +1,5 @@
-LD.B R0, #CALCULATE_LengthOf_Locals;
-MOVE R1, SP;
-ADD R1,R0;
-MOVE SP, R1;
+LD.B R1, #CALCULATE_LengthOf_Locals;
+MOVE R0, SP;
+ADD R0,R1;
+MOVE SP, R0;
 RET;

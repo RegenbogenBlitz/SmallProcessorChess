@@ -169,7 +169,7 @@ CALCULATE_ARG_modeMaxDepth                          EQU CALCULATE_ARG_maxGameVal
 CALCULATE_ARG_enPassantPawnIndex                    EQU CALCULATE_ARG_modeMaxDepth + 2;
 CALCULATE_ARG_depth                                 EQU CALCULATE_ARG_enPassantPawnIndex + 2;
 CALCULATE_ARG_opponentPieceColor                    EQU CALCULATE_ARG_depth + 2;
-CALCULATE_LengthOf_Arguments                        EQU CALCULATE_ARG_opponentPieceColor + 2 - CALCULATE_ARG;
+CALCULATE_LengthOf_Args                             EQU CALCULATE_ARG_opponentPieceColor + 2 - CALCULATE_ARG;
 
 CALCULATE_NEXT_ARG_opponentPieceColor               EQU CALCULATE_LOCAL - 2;
 CALCULATE_NEXT_ARG_depth                            EQU CALCULATE_NEXT_ARG_opponentPieceColor - 2;
@@ -180,10 +180,10 @@ CALCULATE_NEXT_ARG_maxGameValueThatAvoidsPruning    EQU CALCULATE_NEXT_ARG_modeM
 // MUST BE CALLED USING JSR and the stack
 calculate:                                                       // const calculate = (opponentPieceColor, depth, enPassantPawnIndex, modeMaxDepth, maxGameValueThatAvoidsPruning) => {
 
-LD.B R0, #CALCULATE_LengthOf_Locals;
-MOVE R1, SP;
-SUB R1,R0;
-MOVE SP, R1;
+LD.B R1, #CALCULATE_LengthOf_Locals;
+MOVE R0, SP;
+SUB R0,R1;
+MOVE SP, R0;
                                                                  //     dim originPieceColor;
                                                                  //     dim bestGameValue;
                                                                  //     dim originPlayerIsInCheck;
