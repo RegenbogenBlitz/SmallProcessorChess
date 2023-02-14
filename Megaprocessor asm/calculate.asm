@@ -220,7 +220,23 @@ LD.B R0, #BOOL_FALSE;
 ST.B (SP + CALCULATE_LOCAL_originPlayerIsInCheck), R0;
 LD.B R0, (SP + CALCULATE_ARG_modeMaxDepth);
 BNE calculate_originPlayerIsInCheck_notModeZero;                 //     if(modeMaxDepth == 0) {
-// TODO TODO TODO TODO TODO                                      //         originPlayerIsInCheck = calculate(originPieceColor, 0, undefined, 0) > 10000;
+
+ST.W (CALCULATE_NEXT_ARG_opponentPieceColor), R1;                //
+LD.B R0, #0;                                                     //
+ST.W (CALCULATE_NEXT_ARG_depth), R0;                             //
+ST.W (CALCULATE_NEXT_ARG_enPassantPawnIndex), R0;                //
+ST.W (CALCULATE_NEXT_ARG_modeMaxDepth), R0;                      //
+ST.W (CALCULATE_NEXT_ARG_maxGameValueThatAvoidsPruning), R0;     //
+include "calculate_call.asm";                                    //         const calculateResult = calculate(originPieceColor, 0, undefined, 0, 0);
+
+LD.B R2, #BOOL_FALSE;
+LD.W R1, #10000;
+CMP R0,R1;
+BLE calculate__was_not_in_check;
+LD.B R2, #BOOL_TRUE;
+calculate__was_not_in_check:
+ST.B (SP + CALCULATE_LOCAL_originPlayerIsInCheck), R0;           //         originPlayerIsInCheck = calculateResult > 10000;
+
 calculate_originPlayerIsInCheck_notModeZero:                     //     } else {
                                                                  //         originPlayerIsInCheck = false;
                                                                  //     }
