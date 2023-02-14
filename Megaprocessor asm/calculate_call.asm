@@ -1,7 +1,13 @@
+LD.B R0, #CALCULATE_LengthOf_Args;
+MOVE R1, SP;
+SUB R1,R0;
+MOVE SP, R1;
+
 JSR calculate;
-POP R0; // POP CALCULATE_ARG_maxGameValueThatAvoidsPruning
-POP R0; // POP CALCULATE_ARG_modeMaxDepth
-POP R0; // POP CALCULATE_ARG_enPassantPawnIndex
-POP R0; // POP CALCULATE_ARG_depth
-POP R0; // POP CALCULATE_ARG_opponentPieceColor
+
+LD.B R0, #CALCULATE_LengthOf_Args;
+MOVE R1, SP;
+ADD R1,R0;
+MOVE SP, R1;
+
 LD.W R0, calculate_returnValue;

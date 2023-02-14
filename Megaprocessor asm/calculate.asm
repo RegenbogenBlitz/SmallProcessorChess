@@ -134,66 +134,79 @@ MODE1_CHECK_CAN_MOVE  EQU 1;
 MODE2_CALCULATE_MOVE  EQU 2;
 
 CALCULATE_LOCAL EQU 0;
-CALCULATE_LOCAL_justMovedEnPassantPawnIndex EQU CALCULATE_LOCAL;
-CALCULATE_LOCAL_castlingIsProhibited EQU CALCULATE_LOCAL_justMovedEnPassantPawnIndex + 2;
-CALCULATE_LOCAL_moveGameValue EQU CALCULATE_LOCAL_castlingIsProhibited + 2;
-CALCULATE_LOCAL_targetSquareValueAfterMoving EQU CALCULATE_LOCAL_moveGameValue + 2;
-CALCULATE_LOCAL_otherSquareTargetIndex EQU CALCULATE_LOCAL_targetSquareValueAfterMoving + 2;
-CALCULATE_LOCAL_otherSquareOriginIndex EQU CALCULATE_LOCAL_otherSquareTargetIndex + 2;
-CALCULATE_LOCAL_targetSquareValue EQU CALCULATE_LOCAL_otherSquareOriginIndex + 2;
-CALCULATE_LOCAL_targetSquareIndex EQU CALCULATE_LOCAL_targetSquareValue + 2;
-CALCULATE_LOCAL_moveDirectionIndex EQU CALCULATE_LOCAL_targetSquareIndex + 2;
-CALCULATE_LOCAL_moveDirectionNumber EQU CALCULATE_LOCAL_moveDirectionIndex + 2;
-CALCULATE_LOCAL_originPieceIsSlidey EQU CALCULATE_LOCAL_moveDirectionNumber + 2;
-CALCULATE_LOCAL_originPieceIsAKing EQU CALCULATE_LOCAL_originPieceIsSlidey + 2;
-CALCULATE_LOCAL_originPieceIsAPawn EQU CALCULATE_LOCAL_originPieceIsAKing + 2;
-CALCULATE_LOCAL_originPieceIsOnOriginalSquare EQU CALCULATE_LOCAL_originPieceIsAPawn + 2;
-CALCULATE_LOCAL_colorlessOriginPieceValue EQU CALCULATE_LOCAL_originPieceIsOnOriginalSquare + 2;
-CALCULATE_LOCAL_movedOriginPieceValue EQU CALCULATE_LOCAL_colorlessOriginPieceValue + 2;
-CALCULATE_LOCAL_originSquareValue EQU CALCULATE_LOCAL_movedOriginPieceValue + 2;
-CALCULATE_LOCAL_originSquareIndex EQU CALCULATE_LOCAL_originSquareValue + 2;
-CALCULATE_LOCAL_singlePawnJump EQU CALCULATE_LOCAL_originSquareIndex + 2;
-CALCULATE_LOCAL_winGameValue EQU CALCULATE_LOCAL_singlePawnJump + 2;
-CALCULATE_LOCAL_originPlayerIsInCheck EQU CALCULATE_LOCAL_winGameValue + 2;
-CALCULATE_LOCAL_bestGameValue EQU CALCULATE_LOCAL_originPlayerIsInCheck + 2;
-CALCULATE_LOCAL_originPieceColor EQU CALCULATE_LOCAL_bestGameValue + 2;
+CALCULATE_LOCAL_justMovedEnPassantPawnIndex         EQU CALCULATE_LOCAL;
+CALCULATE_LOCAL_castlingIsProhibited                EQU CALCULATE_LOCAL_justMovedEnPassantPawnIndex + 2;
+CALCULATE_LOCAL_moveGameValue                       EQU CALCULATE_LOCAL_castlingIsProhibited + 2;
+CALCULATE_LOCAL_targetSquareValueAfterMoving        EQU CALCULATE_LOCAL_moveGameValue + 2;
+CALCULATE_LOCAL_otherSquareTargetIndex              EQU CALCULATE_LOCAL_targetSquareValueAfterMoving + 2;
+CALCULATE_LOCAL_otherSquareOriginIndex              EQU CALCULATE_LOCAL_otherSquareTargetIndex + 2;
+CALCULATE_LOCAL_targetSquareValue                   EQU CALCULATE_LOCAL_otherSquareOriginIndex + 2;
+CALCULATE_LOCAL_targetSquareIndex                   EQU CALCULATE_LOCAL_targetSquareValue + 2;
+CALCULATE_LOCAL_moveDirectionIndex                  EQU CALCULATE_LOCAL_targetSquareIndex + 2;
+CALCULATE_LOCAL_moveDirectionNumber                 EQU CALCULATE_LOCAL_moveDirectionIndex + 2;
+CALCULATE_LOCAL_originPieceIsSlidey                 EQU CALCULATE_LOCAL_moveDirectionNumber + 2;
+CALCULATE_LOCAL_originPieceIsAKing                  EQU CALCULATE_LOCAL_originPieceIsSlidey + 2;
+CALCULATE_LOCAL_originPieceIsAPawn                  EQU CALCULATE_LOCAL_originPieceIsAKing + 2;
+CALCULATE_LOCAL_originPieceIsOnOriginalSquare       EQU CALCULATE_LOCAL_originPieceIsAPawn + 2;
+CALCULATE_LOCAL_colorlessOriginPieceValue           EQU CALCULATE_LOCAL_originPieceIsOnOriginalSquare + 2;
+CALCULATE_LOCAL_movedOriginPieceValue               EQU CALCULATE_LOCAL_colorlessOriginPieceValue + 2;
+CALCULATE_LOCAL_originSquareValue                   EQU CALCULATE_LOCAL_movedOriginPieceValue + 2;
+CALCULATE_LOCAL_originSquareIndex                   EQU CALCULATE_LOCAL_originSquareValue + 2;
+CALCULATE_LOCAL_singlePawnJump                      EQU CALCULATE_LOCAL_originSquareIndex + 2;
+CALCULATE_LOCAL_winGameValue                        EQU CALCULATE_LOCAL_singlePawnJump + 2;
+CALCULATE_LOCAL_originPlayerIsInCheck               EQU CALCULATE_LOCAL_winGameValue + 2;
+CALCULATE_LOCAL_bestGameValue                       EQU CALCULATE_LOCAL_originPlayerIsInCheck + 2;
+CALCULATE_LOCAL_originPieceColor                    EQU CALCULATE_LOCAL_bestGameValue + 2;
 
-CALCULATE_returnAddress EQU CALCULATE_LOCAL_originPieceColor + 2;
+CALCULATE_LengthOf_Locals                           EQU CALCULATE_LOCAL_originPieceColor + 2 - CALCULATE_LOCAL;
 
-CALCULATE_ARG EQU CALCULATE_returnAddress + 2;
+CALCULATE_returnAddress                             EQU CALCULATE_LOCAL_originPieceColor + 2;
 
-CALCULATE_ARG_maxGameValueThatAvoidsPruning EQU CALCULATE_ARG;
-CALCULATE_ARG_modeMaxDepth EQU CALCULATE_ARG_maxGameValueThatAvoidsPruning + 2;
-CALCULATE_ARG_enPassantPawnIndex EQU CALCULATE_ARG_modeMaxDepth + 2;
-CALCULATE_ARG_depth EQU CALCULATE_ARG_enPassantPawnIndex + 2;
-CALCULATE_ARG_opponentPieceColor EQU CALCULATE_ARG_depth + 2;
+CALCULATE_ARG                                       EQU CALCULATE_returnAddress + 2;
+
+CALCULATE_ARG_maxGameValueThatAvoidsPruning         EQU CALCULATE_ARG;
+CALCULATE_ARG_modeMaxDepth                          EQU CALCULATE_ARG_maxGameValueThatAvoidsPruning + 2;
+CALCULATE_ARG_enPassantPawnIndex                    EQU CALCULATE_ARG_modeMaxDepth + 2;
+CALCULATE_ARG_depth                                 EQU CALCULATE_ARG_enPassantPawnIndex + 2;
+CALCULATE_ARG_opponentPieceColor                    EQU CALCULATE_ARG_depth + 2;
+CALCULATE_LengthOf_Arguments                        EQU CALCULATE_ARG_opponentPieceColor + 2 - CALCULATE_ARG;
+
+CALCULATE_NEXT_ARG_opponentPieceColor               EQU CALCULATE_LOCAL - 2;
+CALCULATE_NEXT_ARG_depth                            EQU CALCULATE_NEXT_ARG_opponentPieceColor - 2;
+CALCULATE_NEXT_ARG_enPassantPawnIndex               EQU CALCULATE_NEXT_ARG_depth - 2;
+CALCULATE_NEXT_ARG_modeMaxDepth                     EQU CALCULATE_NEXT_ARG_enPassantPawnIndex - 2;
+CALCULATE_NEXT_ARG_maxGameValueThatAvoidsPruning    EQU CALCULATE_NEXT_ARG_modeMaxDepth - 2;
 
 // MUST BE CALLED USING JSR and the stack
 calculate:                                                       // const calculate = (opponentPieceColor, depth, enPassantPawnIndex, modeMaxDepth, maxGameValueThatAvoidsPruning) => {
-LD.B R0, #0;
-PUSH R0;                                                         //     dim originPieceColor;
-PUSH R0;                                                         //     dim bestGameValue;
-PUSH R0;                                                         //     dim originPlayerIsInCheck;
-PUSH R0;                                                         //     dim winGameValue;
-PUSH R0;                                                         //     dim singlePawnJump;
-PUSH R0;                                                         //     dim originSquareIndex;
-PUSH R0;                                                         //     dim originSquareValue;
-PUSH R0;                                                         //     dim movedOriginPieceValue;
-PUSH R0;                                                         //     dim colorlessOriginPieceValue;
-PUSH R0;                                                         //     dim originPieceIsOnOriginalSquare;
-PUSH R0;                                                         //     dim originPieceIsAPawn;
-PUSH R0;                                                         //     dim originPieceIsAKing;
-PUSH R0;                                                         //     dim originPieceIsSlidey;
-PUSH R0;                                                         //     dim moveDirectionNumber;
-PUSH R0;                                                         //     dim moveDirectionIndex;
-PUSH R0;                                                         //     dim targetSquareIndex;
-PUSH R0;                                                         //     dim targetSquareValue;
-PUSH R0;                                                         //     dim otherSquareOriginIndex;
-PUSH R0;                                                         //     dim otherSquareTargetIndex;
-PUSH R0;                                                         //     dim targetSquareValueAfterMoving;
-PUSH R0;                                                         //     dim moveGameValue;
-PUSH R0;                                                         //     dim castlingIsProhibited;
-PUSH R0;                                                         //     dim justMovedEnPassantPawnIndex;
+
+LD.B R0, #CALCULATE_LengthOf_Locals;
+MOVE R1, SP;
+SUB R1,R0;
+MOVE SP, R1;
+                                                                 //     dim originPieceColor;
+                                                                 //     dim bestGameValue;
+                                                                 //     dim originPlayerIsInCheck;
+                                                                 //     dim winGameValue;
+                                                                 //     dim singlePawnJump;
+                                                                 //     dim originSquareIndex;
+                                                                 //     dim originSquareValue;
+                                                                 //     dim movedOriginPieceValue;
+                                                                 //     dim colorlessOriginPieceValue;
+                                                                 //     dim originPieceIsOnOriginalSquare;
+                                                                 //     dim originPieceIsAPawn;
+                                                                 //     dim originPieceIsAKing;
+                                                                 //     dim originPieceIsSlidey;
+                                                                 //     dim moveDirectionNumber;
+                                                                 //     dim moveDirectionIndex;
+                                                                 //     dim targetSquareIndex;
+                                                                 //     dim targetSquareValue;
+                                                                 //     dim otherSquareOriginIndex;
+                                                                 //     dim otherSquareTargetIndex;
+                                                                 //     dim targetSquareValueAfterMoving;
+                                                                 //     dim moveGameValue;
+                                                                 //     dim castlingIsProhibited;
+                                                                 //     dim justMovedEnPassantPawnIndex;
 
 LD.B R0, (SP + CALCULATE_ARG_opponentPieceColor);
 LD.B R1, #PIECE_COLOUR_MASK;
@@ -721,18 +734,17 @@ JMP draw_board;                                                  //         draw
 on_click__clickedIsOtherValue:                                   //     } else {
                                                                  //
 LD.W R0, #0x8000;                                                //
-MOVE SP, R0;                                                     //         // reset SP
+MOVE SP, R0;       // reset SP                                   //
 LD.B R0, #PIECE_COLOUR_BLACK;                                    //
-PUSH R0;                                                         //         // push CALCULATE_ARG_opponentPieceColor
+ST.W (CALCULATE_NEXT_ARG_opponentPieceColor), R0;                //
 LD.B R0, #0;                                                     //
-PUSH R0;                                                         //         // push CALCULATE_ARG_depth
+ST.W (CALCULATE_NEXT_ARG_depth), R0;                             //
 LD.B R0, calculate_newEnPassantPawnIndex;                        //
-PUSH R0;                                                         //         // push CALCULATE_ARG_enPassantPawnIndex
+ST.W (CALCULATE_NEXT_ARG_enPassantPawnIndex), R0;                //
 LD.B R0, #MODE1_CHECK_CAN_MOVE;                                  //
-PUSH R0;                                                         //         // push CALCULATE_ARG_modeMaxDepth
+ST.W (CALCULATE_NEXT_ARG_modeMaxDepth), R0;                      //
 LD.W R0, #0;                                                     //
-PUSH R0;                                                         //         // push CALCULATE_ARG_maxGameValueThatAvoidsPruning
-                                                                 //
+ST.W (CALCULATE_NEXT_ARG_maxGameValueThatAvoidsPruning), R0;     //
 include "calculate_call.asm";                                    //         calculate(PIECE_COLOUR_BLACK, 0, calculate_newEnPassantPawnIndex, MODE1_CHECK_CAN_MOVE, 0);
                                                                  //     }
 on_click__return:                                                //
