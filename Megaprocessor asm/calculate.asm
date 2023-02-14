@@ -627,6 +627,12 @@ LD.W R3, #-10000;
 CMP R1,R3;
 BLT calculate__notFoundMoveToPlay;                               //                                 moveGameValue >= -10000) {
 
+JMP calculate__foundMoveToPlay;
+
+calculate__notFoundMoveToPlay:
+JMP calculate__foundMoveToPlay_blockEnd;
+
+calculate__foundMoveToPlay:
 LD.B R0, (SP + CALCULATE_LOCAL_justMovedEnPassantPawnIndex);
 ST.B calculate_newEnPassantPawnIndex, R0;                        //                                 calculate_newEnPassantPawnIndex = justMovedEnPassantPawnIndex;
 
@@ -678,7 +684,7 @@ LD.B R0, #0;
 ST.W calculate_returnValue, R0;
 include "calculate_return.asm";                                  //                                 return;
 
-calculate__notFoundMoveToPlay:                                   //                             }
+calculate__foundMoveToPlay_blockEnd:                             //                             }
 NOP;
 
 //                             castlingIsProhibited = 
