@@ -687,10 +687,12 @@ include "calculate_return.asm";                                  //             
 calculate__foundMoveToPlay_blockEnd:                             //                             }
 NOP;
 
-//                             castlingIsProhibited = 
-//                                 !originPieceIsAKing || moveDirectionNumber < 7 || otherSquareOriginIndex > 0 ||
-//                                 modeMaxDepth === 0 || !(targetSquareValue === PIECE_ENUM_EMPTY) || !originPieceIsOnOriginalSquare || calculate(originPieceColor, 0, undefined, 0) > 10000;
-// 
+//                             if(
+//                                 originPieceIsAKing && moveDirectionNumber >= 7 && otherSquareOriginIndex == 0 &&
+//                                 modeMaxDepth !== 0 && targetSquareValue === PIECE_ENUM_EMPTY && originPieceIsOnOriginalSquare && calculate(originPieceColor, 0, undefined, 0) <= 10000) {
+//                                 castlingIsProhibited = false;
+//                             }
+//                             
 //                             // restore board
 //                             boardState[originSquareIndex] = originSquareValue;
 //                             boardState[targetSquareIndex] = targetSquareValue;
