@@ -687,12 +687,45 @@ include "calculate_return.asm";                                  //             
 calculate__foundMoveToPlay_blockEnd:                             //                             }
 NOP;
 
-//                             if(
-//                                 originPieceIsAKing && moveDirectionNumber >= 7 && otherSquareOriginIndex == 0 &&
-//                                 modeMaxDepth !== 0 && targetSquareValue === PIECE_ENUM_EMPTY && originPieceIsOnOriginalSquare && calculate(originPieceColor, 0, undefined, 0) <= 10000) {
-//                                 castlingIsProhibited = false;
-//                             }
-//                             
+
+LD.B R0, (SP + CALCULATE_LOCAL_originPieceIsAKing);
+BEQ calculate__castlingIsProhibited;                             //                             if(originPieceIsAKing &&
+
+LD.B R0, (SP + CALCULATE_LOCAL_moveDirectionNumber);
+LD.B R1, #7;
+CMP R0,R1;
+BLT calculate__castlingIsProhibited;                             //                                 moveDirectionNumber >= 7 &&
+
+LD.B R0, (SP + CALCULATE_LOCAL_otherSquareOriginIndex);
+BNE calculate__castlingIsProhibited;                             //                                 otherSquareOriginIndex == 0 &&
+
+LD.B R0, (SP + CALCULATE_ARG_modeMaxDepth);
+BEQ calculate__castlingIsProhibited;                             //                                 modeMaxDepth !== 0 &&
+
+LD.B R0, (SP + CALCULATE_LOCAL_targetSquareValue);
+BNE calculate__castlingIsProhibited;                             //                                 targetSquareValue === PIECE_ENUM_EMPTY &&
+
+LD.B R0, (SP + CALCULATE_LOCAL_originPieceIsOnOriginalSquare);
+BEQ calculate__castlingIsProhibited;                             //                                 originPieceIsOnOriginalSquare &&
+
+LD.B R0, (SP + CALCULATE_LOCAL_originPieceColor);
+ST.W (CALCULATE_NEXT_ARG_opponentPieceColor), R0;
+LD.B R0, #0;
+ST.W (CALCULATE_NEXT_ARG_depth), R0;
+ST.W (CALCULATE_NEXT_ARG_enPassantPawnIndex), R0;
+ST.W (CALCULATE_NEXT_ARG_modeMaxDepth), R0;
+ST.W (CALCULATE_NEXT_ARG_maxGameValueThatAvoidsPruning), R0;
+include "calculate_call.asm";
+
+LD.B R1, #10000;
+CMP R0,R1;
+BGT calculate__castlingIsProhibited;                             //                                 calculate(originPieceColor, 0, undefined, 0, 0) <= 10000) {
+
+LD.B R0, #BOOL_FALSE;
+ST.W (SP + CALCULATE_LOCAL_castlingIsProhibited), R0;            //                                 castlingIsProhibited = false;
+
+calculate__castlingIsProhibited:                                 //                             }
+
 //                             // restore board
 //                             boardState[originSquareIndex] = originSquareValue;
 //                             boardState[targetSquareIndex] = targetSquareValue;
