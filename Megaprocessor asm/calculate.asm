@@ -214,7 +214,7 @@ XOR R1, R0;
 ST.B (SP + CALCULATE_LOCAL_originPieceColor), R1;                //     originPieceColor = opponentPieceColor ^ PIECE_COLOUR_MASK;
 
 LD.W R0, #-32768;
-ST.W (SP + CALCULATE_LOCAL_bestGameValue), R1;                   //     bestGameValue = -32768;
+ST.W (SP + CALCULATE_LOCAL_bestGameValue), R0;                   //     bestGameValue = -32768;
 
 LD.B R0, #BOOL_FALSE;
 ST.B (SP + CALCULATE_LOCAL_originPlayerIsInCheck), R0;
