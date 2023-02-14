@@ -726,10 +726,28 @@ ST.W (SP + CALCULATE_LOCAL_castlingIsProhibited), R0;            //             
 
 calculate__castlingIsProhibited:                                 //                             }
 
-//                             // restore board
-//                             boardState[originSquareIndex] = originSquareValue;
-//                             boardState[targetSquareIndex] = targetSquareValue;
-//                             boardState[otherSquareOriginIndex] = boardState[otherSquareTargetIndex];
+                                                                 //                             // restore board
+LD.W R2, #boardState;
+LD.B R3, (SP + CALCULATE_LOCAL_originSquareIndex);
+ADD R2,R3;
+LD.B R1, (SP + CALCULATE_LOCAL_originSquareValue);
+ST.B (R2), R1;                                                   //                             boardState[originSquareIndex] = originSquareValue;
+
+LD.W R2, #boardState;
+LD.B R3, (SP + CALCULATE_LOCAL_targetSquareIndex);
+ADD R2,R3;
+LD.B R1, (SP + CALCULATE_LOCAL_targetSquareValue);
+ST.B (R2), R1;                                                   //                             boardState[targetSquareIndex] = targetSquareValue;
+
+LD.W R2, #boardState;
+LD.B R3, (SP + CALCULATE_LOCAL_otherSquareTargetIndex);
+ADD R2,R3;
+LD.B R1, (R2);
+LD.W R2, #boardState;
+LD.B R0, (SP + CALCULATE_LOCAL_otherSquareOriginIndex);
+ADD R2,R0;
+ST.B (R2), R1;                                                   //                             boardState[otherSquareOriginIndex] = boardState[otherSquareTargetIndex];
+
 //                             if (otherSquareOriginIndex) {
 //                                 if (originPieceIsAPawn) {
 //                                     // restore en passant
