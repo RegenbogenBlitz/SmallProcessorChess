@@ -627,19 +627,60 @@ LD.W R3, #-10000;
 CMP R1,R3;
 BLT calculate__notFoundMoveToPlay;                               //                                 moveGameValue >= -10000) {
 
-//                                 calculate_newEnPassantPawnIndex = justMovedEnPassantPawnIndex;
-//                                 global_selected_square_index = calculate_clickedBoardIndex;
-//                                 renderHtml();
-//                                 if (originPieceColor == whiteColor) {
-//                                     setTimeout(() => {
-//                                         calculate(whiteColor, 0, calculate_newEnPassantPawnIndex, 2);
-//                                         calculate(whiteColor, 0, calculate_newEnPassantPawnIndex, 1);
-//                                     }, 75);
-//                                 }
-//                                 return;
-//                             }
-calculate__notFoundMoveToPlay:
+LD.B R0, (SP + CALCULATE_LOCAL_justMovedEnPassantPawnIndex);
+ST.B calculate_newEnPassantPawnIndex, R0;                        //                                 calculate_newEnPassantPawnIndex = justMovedEnPassantPawnIndex;
+
+ST.B global_selected_square_index, R2;                           //                                 global_selected_square_index = calculate_clickedBoardIndex;
+
+LD.W R0, #calculate__draw_board_return_after_found_move;         //                                 // TODO improve performance by refreshing just the relevant squares
+JMP draw_board;                                                  //                                 draw_board();
+calculate__draw_board_return_after_found_move:
+
+LD.B R0, (SP + CALCULATE_LOCAL_originPieceColor);
+LD.B R1, #PIECE_COLOUR_WHITE;
+CMP R0,R1;
+BNE calculate__notWhiteFoundMove;                                //                                 if (originPieceColor == whiteColor) {
+
+ST.W (CALCULATE_NEXT_ARG_opponentPieceColor), R1;
+
+LD.B R0, #0;
+ST.W (CALCULATE_NEXT_ARG_depth), R0;
+
+LD.B R1, calculate_newEnPassantPawnIndex;
+ST.W (CALCULATE_NEXT_ARG_enPassantPawnIndex), R1;
+
+LD.B R2, #2;
+ST.W (CALCULATE_NEXT_ARG_modeMaxDepth), R2;
+
+ST.W (CALCULATE_NEXT_ARG_maxGameValueThatAvoidsPruning), R0;
+
+include "calculate_call.asm";                                    //                                     calculate(whiteColor, 0, calculate_newEnPassantPawnIndex, 2, 0);
+
+LD.B R1, #PIECE_COLOUR_WHITE;
+ST.W (CALCULATE_NEXT_ARG_opponentPieceColor), R1;
+
+LD.B R0, #0;
+ST.W (CALCULATE_NEXT_ARG_depth), R0;
+
+LD.B R1, calculate_newEnPassantPawnIndex;
+ST.W (CALCULATE_NEXT_ARG_enPassantPawnIndex), R1;
+
+LD.B R2, #1;
+ST.W (CALCULATE_NEXT_ARG_modeMaxDepth), R2;
+
+ST.W (CALCULATE_NEXT_ARG_maxGameValueThatAvoidsPruning), R0;
+
+include "calculate_call.asm";                                    //                                     calculate(whiteColor, 0, calculate_newEnPassantPawnIndex, 1, 0);
+
+calculate__notWhiteFoundMove:                                    //                                 }
+
+LD.B R0, #0;
+ST.W calculate_returnValue, R0;
+include "calculate_return.asm";                                  //                                 return;
+
+calculate__notFoundMoveToPlay:                                   //                             }
 NOP;
+
 //                             castlingIsProhibited = 
 //                                 !originPieceIsAKing || moveDirectionNumber < 7 || otherSquareOriginIndex > 0 ||
 //                                 modeMaxDepth === 0 || !(targetSquareValue === PIECE_ENUM_EMPTY) || !originPieceIsOnOriginalSquare || calculate(originPieceColor, 0, undefined, 0) > 10000;
