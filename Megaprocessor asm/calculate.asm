@@ -587,13 +587,13 @@ SUB R2,R1;                                                       //             
 LD.B R1, (SP + CALCULATE_LOCAL_originPieceColor);
 ST.W (CALCULATE_NEXT_ARG_opponentPieceColor), R1;
 
-LD.B R1, (SP + CALCULATE_NEXT_ARG_depth);
+LD.B R1, (SP + CALCULATE_ARG_depth);
 INC R1;
 ST.W (CALCULATE_NEXT_ARG_depth), R1;
 
 ST.W (CALCULATE_NEXT_ARG_enPassantPawnIndex), R0;
 
-LD.B R1, (SP + CALCULATE_NEXT_ARG_depth);
+LD.B R1, (SP + CALCULATE_ARG_depth);
 ST.W (CALCULATE_NEXT_ARG_modeMaxDepth), R1;
 
 ST.W (CALCULATE_NEXT_ARG_maxGameValueThatAvoidsPruning), R2;
@@ -604,7 +604,29 @@ LD.W R1, (SP + CALCULATE_LOCAL_moveGameValue);
 SUB R1,R0;                                                       //                             const correctedMoveGameValue = moveGameValue - opponentMoveGameValue;
 ST.W (SP + CALCULATE_LOCAL_moveGameValue), R1;                   //                             moveGameValue = correctedMoveGameValue;
 
-//                             if (depth === 0 && modeMaxDepth === 1 && global_selected_square_index === originSquareIndex && targetSquareIndex === calculate_clickedBoardIndex && moveGameValue >= -10000) {
+
+LD.B R3, (SP + CALCULATE_ARG_depth);
+BNE calculate__notFoundMoveToPlay;                               //                             if (depth === 0 &&
+
+LD.B R2, #1;
+LD.B R3, (SP + CALCULATE_ARG_modeMaxDepth);
+CMP R3,R2;
+BNE calculate__notFoundMoveToPlay;                               //                                 modeMaxDepth === 1 &&
+
+LD.B R2, (SP + CALCULATE_LOCAL_originSquareIndex);
+LD.B R3, global_selected_square_index;
+CMP R3,R2;
+BNE calculate__notFoundMoveToPlay;                               //                                 global_selected_square_index === originSquareIndex &&
+
+LD.B R2, calculate_clickedBoardIndex;
+LD.B R3, (SP + CALCULATE_LOCAL_targetSquareIndex);
+CMP R3,R2;
+BNE calculate__notFoundMoveToPlay;                               //                                 targetSquareIndex === calculate_clickedBoardIndex && 
+
+LD.W R3, #-10000;
+CMP R1,R3;
+BLT calculate__notFoundMoveToPlay;                               //                                 moveGameValue >= -10000) {
+
 //                                 calculate_newEnPassantPawnIndex = justMovedEnPassantPawnIndex;
 //                                 global_selected_square_index = calculate_clickedBoardIndex;
 //                                 renderHtml();
@@ -616,7 +638,8 @@ ST.W (SP + CALCULATE_LOCAL_moveGameValue), R1;                   //             
 //                                 }
 //                                 return;
 //                             }
-// 
+calculate__notFoundMoveToPlay:
+NOP;
 //                             castlingIsProhibited = 
 //                                 !originPieceIsAKing || moveDirectionNumber < 7 || otherSquareOriginIndex > 0 ||
 //                                 modeMaxDepth === 0 || !(targetSquareValue === PIECE_ENUM_EMPTY) || !originPieceIsOnOriginalSquare || calculate(originPieceColor, 0, undefined, 0) > 10000;
