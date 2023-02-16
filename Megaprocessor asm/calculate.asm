@@ -741,25 +741,33 @@ ST.B (R2), R1;                                                   //             
 
 LD.W R2, #boardState;
 LD.B R3, (SP + CALCULATE_LOCAL_otherSquareTargetIndex);
-ADD R2,R3;
-LD.B R1, (R2);
-LD.W R2, #boardState;
+ADD R3,R2;
+LD.B R1, (R3);
 LD.B R0, (SP + CALCULATE_LOCAL_otherSquareOriginIndex);
 ADD R2,R0;
 ST.B (R2), R1;                                                   //                             boardState[otherSquareOriginIndex] = boardState[otherSquareTargetIndex];
 
-//                             if (otherSquareOriginIndex) {
-//                                 if (originPieceIsAPawn) {
-//                                     // restore en passant
-//                                     const targetColorPawnPieceValue = 9 ^ originPieceColor
-//                                     boardState[otherSquareTargetIndex] = targetColorPawnPieceValue;
-//                                 }
-//                                 else {
-//                                     // restore castling
-//                                     boardState[otherSquareTargetIndex] = 0;
-//                                 }
-// 
-//                             }
+TEST R0;
+BEQ calculate__can_go_deeper_blockend;                           //                             if (otherSquareOriginIndex) {
+
+                                                                 //                                 let restoreOtherSquareTargetValue;
+LD.B R0, (SP + CALCULATE_LOCAL_originPieceIsAPawn);
+BEQ calculate__originPieceIsNotAPawn;                            //                                 if (originPieceIsAPawn) {
+                                                                 //                                     // restore en passant
+
+LD.B R0, (SP + CALCULATE_LOCAL_originPieceColor);
+LD.B R1, #PIECE_ENUM_WHITE_PAWN;
+XOR R1, R0;                                                      //                                     restoreOtherSquareTargetValue = PIECE_ENUM_WHITE_PAWN ^ originPieceColor;
+
+JMP calculate__originPieceIsAPawn_blockEnd;                      //                                 }
+calculate__originPieceIsNotAPawn:                                //                                 else {
+                                                                 //                                     // restore castling
+LD.B R1, #0;                                                     //                                     restoreOtherSquareTargetValue = 0;
+
+calculate__originPieceIsAPawn_blockEnd:                          //                                 }
+ST.B (R3), R1;                                                   //                                 boardState[otherSquareTargetIndex] = restoreOtherSquareTargetValue;
+                                                                 //                             }
+
 calculate__can_go_deeper_blockend:                               //                         }
 NOP;
 //                         if (moveGameValue > bestGameValue || (depth === 0 && moveGameValue == bestGameValue && Math.random() < .5)) {
