@@ -128,6 +128,8 @@ calculate_clickedBoardIndex:
 DB 0;
 calculate_returnValue:
 DW 0;
+calculate_randomValue:
+DW 0;
 
 MODE0_CHECK_FOR_CHECK EQU 0;
 MODE1_CHECK_CAN_MOVE  EQU 1;
@@ -769,22 +771,59 @@ ST.B (R3), R1;                                                   //             
                                                                  //                             }
 
 calculate__can_go_deeper_blockend:                               //                         }
-NOP;
-//                         if (moveGameValue > bestGameValue || (depth === 0 && moveGameValue == bestGameValue && Math.random() < .5)) {
-//                             bestGameValue = moveGameValue;
-//                             if (modeMaxDepth === 2) {
-//                                 if (depth > 0) {
-//                                     if (bestGameValue > maxGameValueThatAvoidsPruning) {
-//                                         return bestGameValue;
-//                                     }
-//                                 }
-//                                 else {
-//                                     global_selected_square_index = originSquareIndex;
-//                                     calculate_clickedBoardIndex = targetSquareIndex;
-//                                 }
-//                             }
-//                         }
-//
+
+LD.W R0, (SP + CALCULATE_LOCAL_moveGameValue);
+LD.W R1, (SP + CALCULATE_LOCAL_bestGameValue);
+CMP R0,R1;
+BGT calculate__betterMoveFound;                                  //                         if (moveGameValue > bestGameValue ||
+
+BNE calculate__betterMoveFound_blockEnd;                         //                             (moveGameValue == bestGameValue &&
+
+LD.B R1, (SP + CALCULATE_ARG_depth);
+BNE calculate__betterMoveFound_blockEnd;                         //                             depth === 0 &&
+
+//COUNTER_ADDRESS EQU #0x8000
+//LD.W R2, COUNTER_ADDRESS;
+LD.W R2, calculate_randomValue;
+INC R2;
+ST.W calculate_randomValue, R2; // Temporary "random" generator
+
+BTST R2, #2;  // Test 3rd LSB
+BEQ calculate__betterMoveFound_blockEnd;                         //                             Math.random() < .5)) {
+
+calculate__betterMoveFound:
+
+ST.W (SP + CALCULATE_LOCAL_bestGameValue), R0;                   //                             bestGameValue = moveGameValue;
+
+LD.W R2, (SP + CALCULATE_ARG_modeMaxDepth);
+LD.W R3, #2;
+CMP R2,R3;
+BNE calculate__betterMoveFound_blockEnd;                         //                             if (modeMaxDepth === 2) {
+
+LD.B R1, (SP + CALCULATE_ARG_depth);
+BLE calculate__depthEqualsZero;                                  //                                 if (depth > 0) {
+
+LD.B R1, (SP + CALCULATE_ARG_maxGameValueThatAvoidsPruning);
+CMP R0,R1;
+BLE calculate__betterMoveFound_blockEnd;                         //                                     if (bestGameValue > maxGameValueThatAvoidsPruning) {
+
+ST.W calculate_returnValue, R0;
+include "calculate_return.asm";                                  //                                         return bestGameValue;
+                                                                 //                                     }
+
+                                                                 //                                 }
+calculate__depthEqualsZero:                                      //                                 else {
+
+LD.B R0, (SP + CALCULATE_LOCAL_originSquareIndex);
+ST.B global_selected_square_index, R0;                           //                                     global_selected_square_index = originSquareIndex;
+
+LD.B R0, (SP + CALCULATE_LOCAL_targetSquareIndex);
+ST.B calculate_clickedBoardIndex, R0;                            //                                     calculate_clickedBoardIndex = targetSquareIndex;
+                                                                 //                                 }
+                                                                 //                             }
+
+calculate__betterMoveFound_blockEnd:                             //                         }
+
 //                         let canAlsoCastle;
 //                         if (castlingIsProhibited || originPlayerIsInCheck) {
 //                             canAlsoCastle = false;
