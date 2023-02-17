@@ -513,7 +513,7 @@ calculate__set_moveGameValue:                                    //             
 ST.W (SP + CALCULATE_LOCAL_moveGameValue), R1;
 
 LD.B R0, #BOOL_TRUE;
-ST.W (SP + CALCULATE_LOCAL_castlingIsProhibited), R0;            //                         castlingIsProhibited = true;
+ST.B (SP + CALCULATE_LOCAL_castlingIsProhibited), R0;            //                         castlingIsProhibited = true;
 
 LD.B R2, (SP + CALCULATE_ARG_modeMaxDepth);
 LD.B R3, (SP + CALCULATE_ARG_depth);
@@ -724,7 +724,7 @@ CMP R0,R1;
 BGT calculate__castlingIsProhibited;                             //                                 calculate(originPieceColor, 0, undefined, 0, 0) <= 10000) {
 
 LD.B R0, #BOOL_FALSE;
-ST.W (SP + CALCULATE_LOCAL_castlingIsProhibited), R0;            //                                 castlingIsProhibited = false;
+ST.B (SP + CALCULATE_LOCAL_castlingIsProhibited), R0;            //                                 castlingIsProhibited = false;
 
 calculate__castlingIsProhibited:                                 //                             }
 
@@ -824,13 +824,37 @@ ST.B calculate_clickedBoardIndex, R0;                            //             
 
 calculate__betterMoveFound_blockEnd:                             //                         }
 
-//                         let canAlsoCastle;
-//                         if (castlingIsProhibited || originPlayerIsInCheck) {
-//                             canAlsoCastle = false;
-//                         } else {
-//                             // castling
-//                             otherSquareTargetIndex = targetSquareIndex;
-//                             otherSquareOriginIndex = targetSquareIndex < originSquareIndex ? otherSquareTargetIndex - 3 : otherSquareTargetIndex + 2;
+                                                                 //                         let canAlsoCastle;
+
+LD.B R0, (SP + CALCULATE_LOCAL_castlingIsProhibited);
+BNE calculate__origin_can_move_to_target_block_end;              //                         if (castlingIsProhibited ||
+
+LD.B R0, (SP + CALCULATE_LOCAL_originPlayerIsInCheck);
+BNE calculate__origin_can_move_to_target_block_end;              //                             originPlayerIsInCheck) {
+
+                                                                 //                             canAlsoCastle = false;
+// Falls through if neither true                                 //                         } else {
+                                                                 //                             // castling
+kingstep R1
+otherSquareOriginIndex R2
+
+LD.B R0, (SP + CALCULATE_LOCAL_targetSquareIndex);
+MOVE R2,R0;
+LD.B R1, (SP + CALCULATE_LOCAL_originSquareIndex);
+CMP R0,R1;
+BGE calculate__targetGreaterThanOrigin;                          //                             if(targetSquareIndex < originSquareIndex) {
+
+LD.B R1, #3;
+SUB R2,R1;                                                       //                                 otherSquareOriginIndex =  targetSquareIndex - 3;
+
+calculate__targetGreaterThanOrigin:                              //                             } else {
+
+LD.B R1, #2;
+ADD R2,R1;                                                       //                                 otherSquareOriginIndex =  targetSquareIndex + 2;
+
+calculate__targetLessThanOrigin_blockend:                        //                             }
+ST.B (SP + CALCULATE_LOCAL_otherSquareTargetIndex), R2;
+
 //                             const kingStep = targetSquareIndex - originSquareIndex;
 //                             targetSquareIndex += kingStep;
 //                             const rookIsUnmoved = boardState[otherSquareOriginIndex] >= 0b1111;
