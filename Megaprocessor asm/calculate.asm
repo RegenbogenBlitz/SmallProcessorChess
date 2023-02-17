@@ -835,34 +835,59 @@ BNE calculate__origin_can_move_to_target_block_end;              //             
                                                                  //                             canAlsoCastle = false;
 // Falls through if neither true                                 //                         } else {
                                                                  //                             // castling
-kingstep R1
-otherSquareOriginIndex R2
 
 LD.B R0, (SP + CALCULATE_LOCAL_targetSquareIndex);
 MOVE R2,R0;
+MOVE R3,R0;
+
+ST.B (SP + CALCULATE_LOCAL_otherSquareTargetIndex), R0;          //                             otherSquareTargetIndex =  targetSquareIndex;
+
 LD.B R1, (SP + CALCULATE_LOCAL_originSquareIndex);
 CMP R0,R1;
 BGE calculate__targetGreaterThanOrigin;                          //                             if(targetSquareIndex < originSquareIndex) {
 
 LD.B R1, #3;
-SUB R2,R1;                                                       //                                 otherSquareOriginIndex =  targetSquareIndex - 3;
+SUB R2,R1;                                                       //                                 otherSquareOriginIndex =  otherSquareTargetIndex - 3;
 
+JMP calculate__targetLessThanOrigin_blockend;
 calculate__targetGreaterThanOrigin:                              //                             } else {
 
 LD.B R1, #2;
-ADD R2,R1;                                                       //                                 otherSquareOriginIndex =  targetSquareIndex + 2;
+ADD R2,R1;                                                       //                                 otherSquareOriginIndex =  otherSquareTargetIndex + 2;
 
 calculate__targetLessThanOrigin_blockend:                        //                             }
-ST.B (SP + CALCULATE_LOCAL_otherSquareTargetIndex), R2;
+ST.B (SP + CALCULATE_LOCAL_otherSquareOriginIndex), R2;
 
-//                             const kingStep = targetSquareIndex - originSquareIndex;
-//                             targetSquareIndex += kingStep;
-//                             const rookIsUnmoved = boardState[otherSquareOriginIndex] >= 0b1111;
-//                             const rookAdjacentTargetIsEmpty = boardState[otherSquareOriginIndex - kingStep] == 0;
-//                             const kingTargetIsEmpty = boardState[targetSquareIndex] == 0;
-//                             canAlsoCastle = rookIsUnmoved && rookAdjacentTargetIsEmpty && kingTargetIsEmpty;
-//                         }
-//                     } while (canAlsoCastle)
+LD.B R1, (SP + CALCULATE_LOCAL_originSquareIndex);
+SUB R3,R1;                                                       //                             const kingStep = targetSquareIndex - originSquareIndex;
+
+ADD R0,R3;
+ST.B (SP + CALCULATE_LOCAL_targetSquareIndex), R0;               //                             targetSquareIndex += kingStep;
+
+
+LD.B R1, #boardState;
+ADD R2,R1;
+LD.B R1, (R2);
+LD.B R2, #UNMOVED_PIECE;
+CMP R1,R2;
+BLT calculate__origin_can_move_to_target_block_end;              //                             const rookIsUnmoved = boardState[otherSquareOriginIndex] >= UNMOVED_PIECE;
+
+LD.B R1, #boardState;
+LD.B R2, (SP + CALCULATE_LOCAL_otherSquareOriginIndex);
+ADD R2,R1;
+SUB R2,R3;
+LD.B R1, (R2);
+BNE calculate__origin_can_move_to_target_block_end;              //                             const rookAdjacentTargetIsEmpty = boardState[otherSquareOriginIndex - kingStep] == 0;
+
+LD.B R1, #boardState;
+LD.B R2, (SP + CALCULATE_LOCAL_targetSquareIndex);
+ADD R2,R1;
+LD.B R1, (R2);
+BNE calculate__origin_can_move_to_target_block_end;              //                             const kingTargetIsEmpty = boardState[targetSquareIndex] == 0;
+
+JMP calculate__makeMove_loop_start;                              //                             canAlsoCastle = rookIsUnmoved && rookAdjacentTargetIsEmpty && kingTargetIsEmpty;
+                                                                 //                         }
+                                                                 //                     } while (canAlsoCastle)
 
 calculate__origin_can_move_to_target_block_end:                  //                 }
 
