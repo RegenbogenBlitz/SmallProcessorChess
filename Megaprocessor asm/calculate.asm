@@ -1004,7 +1004,7 @@ BNE calculate_handleOriginPiece_blockEnd;                        //             
 
 calculate__remainingMovesAreValidForPiece:                       //                     if (remainingMovesAreValidForPiece) {
 LD.W R0, (SP + CALCULATE_LOCAL_moveDirectionIndex);
-INC R0;
+ADDQ R0, #2; // Add 2 because the values are stored as Words
 ST.W (SP + CALCULATE_LOCAL_moveDirectionIndex), R0;              //                         moveDirectionIndex++;
 
 LD.B R0, (SP + CALCULATE_LOCAL_moveDirectionNumber);
