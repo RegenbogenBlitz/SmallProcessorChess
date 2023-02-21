@@ -375,7 +375,7 @@ calculate_more_moves_loop_start:                                 //             
 LD.B R0, (SP + CALCULATE_LOCAL_targetSquareIndex);
 LD.W R2, (SP + CALCULATE_LOCAL_moveDirectionIndex);
 LD.B R1, (R2);
-ADD R0,R2;
+ADD R0,R1;
 ST.B (SP + CALCULATE_LOCAL_targetSquareIndex), R0;               //                 targetSquareIndex += moveDirections[moveDirectionIndex];
 
 LD.W R2, #boardState;
