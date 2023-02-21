@@ -221,7 +221,7 @@ ST.W (SP + CALCULATE_LOCAL_bestGameValue), R0;                   //     bestGame
 LD.B R0, #BOOL_FALSE;
 ST.B (SP + CALCULATE_LOCAL_originPlayerIsInCheck), R0;
 LD.B R0, (SP + CALCULATE_ARG_modeMaxDepth);
-BNE calculate_originPlayerIsInCheck_notModeZero;                 //     if(modeMaxDepth == 0) {
+BEQ calculate_originPlayerIsInCheck_notModeIsZero;               //     if(modeMaxDepth != 0) {
 
 MOVE R0,SP;
 MOVE R3,R0;
@@ -256,7 +256,7 @@ LD.B R2, #BOOL_TRUE;
 calculate__was_not_in_check:
 ST.B (SP + CALCULATE_LOCAL_originPlayerIsInCheck), R0;           //         originPlayerIsInCheck = calculateResult > 10000;
 
-calculate_originPlayerIsInCheck_notModeZero:                     //     } else {
+calculate_originPlayerIsInCheck_notModeIsZero:                   //     } else {
                                                                  //         originPlayerIsInCheck = false;
                                                                  //     }
 
