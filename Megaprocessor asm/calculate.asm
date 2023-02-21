@@ -245,8 +245,9 @@ ST.W (R2), R0;
 
 LD.W R2, #CALCULATE_NEXT_ARG_maxGameValueThatAvoidsPruning;
 ADD R2,R3;
+//LD.B R0, #MODE0_CHECK_FOR_CHECK;
 ST.W (R2), R0;
-include "calculate_call.asm";                                    //         const calculateResult = calculate(originPieceColor, 0, undefined, 0, 0);
+include "calculate_call.asm";                                    //         const calculateResult = calculate(originPieceColor, 0, undefined, MODE0_CHECK_FOR_CHECK, 0);
 
 LD.B R2, #BOOL_FALSE;
 LD.W R1, #10000;
@@ -699,14 +700,14 @@ ST.W (R2), R1;
 
 LD.W R2, #CALCULATE_NEXT_ARG_modeMaxDepth;
 ADD R2,R3;
-LD.B R1, #2;
+LD.B R1, #MODE2_CALCULATE_MOVE;
 ST.W (R2), R1;
 
 LD.W R2, #CALCULATE_NEXT_ARG_maxGameValueThatAvoidsPruning;
 ADD R2,R3;
 ST.W (R2), R0;
 
-include "calculate_call.asm";                                    //                                     calculate(whiteColor, 0, calculate_newEnPassantPawnIndex, 2, 0);
+include "calculate_call.asm";                                    //                                     calculate(whiteColor, 0, calculate_newEnPassantPawnIndex, MODE2_CALCULATE_MOVE, 0);
 
 MOVE R0,SP;
 MOVE R3,R0;
@@ -727,14 +728,14 @@ ST.W (R2), R1;
 
 LD.W R2, #CALCULATE_NEXT_ARG_modeMaxDepth;
 ADD R2,R3;
-LD.B R1, #1;
+LD.B R1, #MODE1_CHECK_CAN_MOVE;
 ST.W (R2), R1;
 
 LD.W R2, #CALCULATE_NEXT_ARG_maxGameValueThatAvoidsPruning;
 ADD R2,R3;
 ST.W (R2), R0;
 
-include "calculate_call.asm";                                    //                                     calculate(whiteColor, 0, calculate_newEnPassantPawnIndex, 1, 0);
+include "calculate_call.asm";                                    //                                     calculate(whiteColor, 0, calculate_newEnPassantPawnIndex, MODE1_CHECK_CAN_MOVE, 0);
 
 calculate__notWhiteFoundMove:                                    //                                 }
 
@@ -785,6 +786,7 @@ ST.W (R2), R0;
 
 LD.W R2, #CALCULATE_NEXT_ARG_modeMaxDepth;
 ADD R2,R3;
+//LD.B R0, #MODE0_CHECK_FOR_CHECK;
 ST.W (R2), R0;
 
 LD.W R2, #CALCULATE_NEXT_ARG_maxGameValueThatAvoidsPruning;
@@ -795,7 +797,7 @@ include "calculate_call.asm";
 
 LD.B R1, #10000;
 CMP R0,R1;
-BGT calculate__castlingIsProhibited;                             //                                 calculate(originPieceColor, 0, undefined, 0, 0) <= 10000) {
+BGT calculate__castlingIsProhibited;                             //                                 calculate(originPieceColor, 0, undefined, MODE0_CHECK_FOR_CHECK, 0) <= 10000) {
 
 LD.B R0, #BOOL_FALSE;
 ST.B (SP + CALCULATE_LOCAL_castlingIsProhibited), R0;            //                                 castlingIsProhibited = false;
