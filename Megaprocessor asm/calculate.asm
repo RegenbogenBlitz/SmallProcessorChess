@@ -379,7 +379,7 @@ ADD R0,R1;
 ST.B (SP + CALCULATE_LOCAL_targetSquareIndex), R0;               //                 targetSquareIndex += moveDirections[moveDirectionIndex];
 
 LD.W R2, #boardState;
-ADD R2, R1;
+ADD R2, R0;
 LD.B R1, (R2);
 ST.B (SP + CALCULATE_LOCAL_targetSquareValue), R1;               //                 targetSquareValue = boardState[targetSquareIndex];
 
