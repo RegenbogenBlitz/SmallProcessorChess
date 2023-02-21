@@ -575,7 +575,7 @@ ADD R2,R0;
 ST.B (R2), R1;                                                   //                             boardState[otherSquareTargetIndex] = boardState[otherSquareOriginIndex];
 
 TEST R3;
-BNE calculate__otherSquareOriginIndexNotSet;                     //                             if (otherSquareOriginIndex) {
+BEQ calculate__otherSquareOriginIndexNotSet;                     //                             if (otherSquareOriginIndex != 0) {
 
 LD.W R2, #boardState;
 ADD R3,R2;
