@@ -360,13 +360,13 @@ LD.B R3, #8;
 calculate_originSquareValue_isNot8Directional:
 ST.B (SP + CALCULATE_LOCAL_moveDirectionNumber), R3;             //             moveDirectionNumber = (colorlessOriginPieceValue & 2) ? 8 : 4; // number of move directions: pawn 4, king 8, knight 8, bishop 4, rook 4, queen 8
 
-LD.W R3, #-1;
-ADD R3,R1;
-ADD R3,R3;  // double as each value is a word
+NOP;NOP;NOP;
+NOP;
+ADD R1,R1;  // double as each value is a word
 LD.W R2, #calculate_initial_move_direction_indexes;
-ADD R3,R2;
-LD.W R0, (R3);
-ST.W (SP + CALCULATE_LOCAL_moveDirectionIndex), R0;              //             moveDirectionIndex = initialMoveDirectionIndexes[movedOriginPieceValue - 1];
+ADD R2,R1;
+LD.W R0, (R2);
+ST.W (SP + CALCULATE_LOCAL_moveDirectionIndex), R0;              //             moveDirectionIndex = initialMoveDirectionIndexes[movedOriginPieceValue];
 
 LD.B R0, (SP + CALCULATE_LOCAL_originSquareIndex);
 ST.B (SP + CALCULATE_LOCAL_targetSquareIndex), R0;               //             targetSquareIndex = originSquareIndex;
