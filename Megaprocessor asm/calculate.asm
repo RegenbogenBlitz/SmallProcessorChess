@@ -285,7 +285,7 @@ CMP R0, R2;
 BNE calculate_singlePawnJump_black;                              //     if(originPieceColor == whiteColor) {
 NEG R1;                                                          //         singlePawnJump = -singlePawnJump;
 calculate_singlePawnJump_black:                                  //     }
-ST.B (SP + CALCULATE_LOCAL_singlePawnJump), R1;
+ST.W (SP + CALCULATE_LOCAL_singlePawnJump), R1;
 
 LD.B R0, #21;
 ST.B (SP + CALCULATE_LOCAL_originSquareIndex), R0;               //     originSquareIndex = 21;
@@ -397,7 +397,7 @@ JMP calculate__origin_can_move_to_target_block_start;            //             
 calculate__empty_target_origin_pawn:                             //                     } else {
 
 
-LD.B R2, (SP + CALCULATE_LOCAL_singlePawnJump);
+LD.W R2, (SP + CALCULATE_LOCAL_singlePawnJump);
 MOVE R3, R0;
 SUB R3,R2;
 LD.B R2, (SP + CALCULATE_ARG_enPassantPawnIndex);
@@ -463,7 +463,7 @@ BEQ calculate__makeMove_loop_start;                              //             
 
 LD.W R2, #boardState;
 ADD R2, R0;
-LD.B R3, (SP + CALCULATE_LOCAL_singlePawnJump);
+LD.W R3, (SP + CALCULATE_LOCAL_singlePawnJump);
 ADD R2, R3;
 LD.B R0, (R2);
 LD.B R2, #PIECE_ENUM_OFFBOARD;
