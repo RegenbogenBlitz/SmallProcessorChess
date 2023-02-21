@@ -574,19 +574,19 @@ LD.B R0, (SP + CALCULATE_LOCAL_otherSquareTargetIndex);
 ADD R2,R0;
 ST.B (R2), R1;                                                   //                             boardState[otherSquareTargetIndex] = boardState[otherSquareOriginIndex];
 
+LD.W R1, #PIECE_ENUM_EMPTY;
+
 TEST R3;
 BEQ calculate__otherSquareOriginIndexNotSet;                     //                             if (otherSquareOriginIndex != 0) {
 
 LD.W R2, #boardState;
 ADD R3,R2;
-LD.W R1, #PIECE_ENUM_EMPTY;
 ST.B (R3), R1;                                                   //                                 boardState[otherSquareOriginIndex] = PIECE_ENUM_EMPTY;
 calculate__otherSquareOriginIndexNotSet:                         //                             }
 
 LD.B R0, (SP + CALCULATE_LOCAL_originSquareIndex);
 ADD R2,R0;
 ST.B (R2), R1;                                                   //                             boardState[originSquareIndex] = PIECE_ENUM_EMPTY;
-
 
 LD.B R0, #0;                                                     //                             justMovedEnPassantPawnIndex = 0;
 
