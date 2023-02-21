@@ -386,6 +386,7 @@ ST.B (SP + CALCULATE_LOCAL_otherSquareOriginIndex), R3;          //             
 ST.B (SP + CALCULATE_LOCAL_otherSquareTargetIndex), R3;          //                 otherSquareTargetIndex = 0;
 
                                                                  //                 let originCanMoveToTarget;
+TEST R1;
 BNE calculate__target_not_empty;                                 //                 if(targetSquareValue === PIECE_ENUM_EMPTY) {
 
 LD.B R2, (SP + CALCULATE_LOCAL_originPieceIsAPawn);
