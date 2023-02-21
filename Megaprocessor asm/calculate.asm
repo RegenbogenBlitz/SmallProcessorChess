@@ -223,12 +223,29 @@ ST.B (SP + CALCULATE_LOCAL_originPlayerIsInCheck), R0;
 LD.B R0, (SP + CALCULATE_ARG_modeMaxDepth);
 BNE calculate_originPlayerIsInCheck_notModeZero;                 //     if(modeMaxDepth == 0) {
 
-ST.W (CALCULATE_NEXT_ARG_opponentPieceColor), R1;                //
-LD.B R0, #0;                                                     //
-ST.W (CALCULATE_NEXT_ARG_depth), R0;                             //
-ST.W (CALCULATE_NEXT_ARG_enPassantPawnIndex), R0;                //
-ST.W (CALCULATE_NEXT_ARG_modeMaxDepth), R0;                      //
-ST.W (CALCULATE_NEXT_ARG_maxGameValueThatAvoidsPruning), R0;     //
+MOVE R0,SP;
+MOVE R3,R0;
+LD.W R2, #CALCULATE_NEXT_ARG_opponentPieceColor;
+ADD R2,R3;
+ST.W (R2), R1;
+
+LD.B R0, #0;
+
+LD.W R2, #CALCULATE_NEXT_ARG_depth;
+ADD R2,R3;
+ST.W (R2), R0;
+
+LD.W R2, #CALCULATE_NEXT_ARG_enPassantPawnIndex;
+ADD R2,R3;
+ST.W (R2), R0;
+
+LD.W R2, #CALCULATE_NEXT_ARG_modeMaxDepth;
+ADD R2,R3;
+ST.W (R2), R0;
+
+LD.W R2, #CALCULATE_NEXT_ARG_maxGameValueThatAvoidsPruning;
+ADD R2,R3;
+ST.W (R2), R0;
 include "calculate_call.asm";                                    //         const calculateResult = calculate(originPieceColor, 0, undefined, 0, 0);
 
 LD.B R2, #BOOL_FALSE;
@@ -582,23 +599,38 @@ calculate__pawnDidNotJustMoveTwoSpaces:                          //             
 
 ST.B (SP + CALCULATE_LOCAL_justMovedEnPassantPawnIndex), R0;
 
-LD.W R2, (SP + CALCULATE_LOCAL_moveGameValue);
-LD.W R1, (SP + CALCULATE_LOCAL_bestGameValue);
-SUB R2,R1;                                                       //                             const maxOpponentGameValueThatAvoidsPruning = moveGameValue - bestGameValue;
+LD.W R1, (SP + CALCULATE_LOCAL_moveGameValue);
+LD.W R2, (SP + CALCULATE_LOCAL_bestGameValue);
+SUB R1,R2;                                                       //                             const maxOpponentGameValueThatAvoidsPruning = moveGameValue - bestGameValue;
 
-LD.B R1, (SP + CALCULATE_LOCAL_originPieceColor);
-ST.W (CALCULATE_NEXT_ARG_opponentPieceColor), R1;
+MOVE R2,R0;
+MOVE R0,SP;
+MOVE R3,R0;
+MOVE R0,R2;
+LD.W R2, #CALCULATE_NEXT_ARG_opponentPieceColor;
+ADD R2,R3;
+LD.B R0, (SP + CALCULATE_LOCAL_originPieceColor);
+ST.W (R2), R0;
 
-LD.B R1, (SP + CALCULATE_ARG_depth);
-INC R1;
-ST.W (CALCULATE_NEXT_ARG_depth), R1;
+LD.W R2, #CALCULATE_NEXT_ARG_depth;
+ADD R2,R3;
+LD.B R0, (SP + CALCULATE_ARG_depth);
+INC R0;
+ST.W (R2), R0;
 
-ST.W (CALCULATE_NEXT_ARG_enPassantPawnIndex), R0;
+LD.W R2, #CALCULATE_NEXT_ARG_enPassantPawnIndex;
+ADD R2,R3;
+LD.B R0, (SP + CALCULATE_LOCAL_justMovedEnPassantPawnIndex);
+ST.W (R2), R0;
 
-LD.B R1, (SP + CALCULATE_ARG_depth);
-ST.W (CALCULATE_NEXT_ARG_modeMaxDepth), R1;
+LD.W R2, #CALCULATE_NEXT_ARG_modeMaxDepth;
+ADD R2,R3;
+LD.B R0, (SP + CALCULATE_ARG_modeMaxDepth);
+ST.W (R2), R0;
 
-ST.W (CALCULATE_NEXT_ARG_maxGameValueThatAvoidsPruning), R2;
+LD.W R2, #CALCULATE_NEXT_ARG_maxGameValueThatAvoidsPruning;
+ADD R2,R3;
+ST.W (R2), R1;
 
 include "calculate_call.asm";                                    //                             const opponentMoveGameValue = calculate(originPieceColor, depth + 1, justMovedEnPassantPawnIndex, modeMaxDepth, maxOpponentGameValueThatAvoidsPruning);
 
@@ -649,34 +681,58 @@ LD.B R1, #PIECE_COLOUR_WHITE;
 CMP R0,R1;
 BNE calculate__notWhiteFoundMove;                                //                                 if (originPieceColor == whiteColor) {
 
-ST.W (CALCULATE_NEXT_ARG_opponentPieceColor), R1;
+MOVE R0,SP;
+MOVE R3,R0;
+LD.W R2, #CALCULATE_NEXT_ARG_opponentPieceColor;
+ADD R2,R3;
+ST.W (R2), R1;
 
+LD.W R2, #CALCULATE_NEXT_ARG_depth;
+ADD R2,R3;
 LD.B R0, #0;
-ST.W (CALCULATE_NEXT_ARG_depth), R0;
+ST.W (R2), R0;
 
+LD.W R2, #CALCULATE_NEXT_ARG_enPassantPawnIndex;
+ADD R2,R3;
 LD.B R1, calculate_newEnPassantPawnIndex;
-ST.W (CALCULATE_NEXT_ARG_enPassantPawnIndex), R1;
+ST.W (R2), R1;
 
-LD.B R2, #2;
-ST.W (CALCULATE_NEXT_ARG_modeMaxDepth), R2;
+LD.W R2, #CALCULATE_NEXT_ARG_modeMaxDepth;
+ADD R2,R3;
+LD.B R1, #2;
+ST.W (R2), R1;
 
-ST.W (CALCULATE_NEXT_ARG_maxGameValueThatAvoidsPruning), R0;
+LD.W R2, #CALCULATE_NEXT_ARG_maxGameValueThatAvoidsPruning;
+ADD R2,R3;
+ST.W (R2), R0;
 
 include "calculate_call.asm";                                    //                                     calculate(whiteColor, 0, calculate_newEnPassantPawnIndex, 2, 0);
 
+MOVE R0,SP;
+MOVE R3,R0;
+LD.W R2, #CALCULATE_NEXT_ARG_opponentPieceColor;
+ADD R2,R3;
 LD.B R1, #PIECE_COLOUR_WHITE;
-ST.W (CALCULATE_NEXT_ARG_opponentPieceColor), R1;
+ST.W (R2), R1;
 
+LD.W R2, #CALCULATE_NEXT_ARG_depth;
+ADD R2,R3;
 LD.B R0, #0;
-ST.W (CALCULATE_NEXT_ARG_depth), R0;
+ST.W (R2), R0;
 
+LD.W R2, #CALCULATE_NEXT_ARG_enPassantPawnIndex;
+ADD R2,R3;
 LD.B R1, calculate_newEnPassantPawnIndex;
-ST.W (CALCULATE_NEXT_ARG_enPassantPawnIndex), R1;
+ST.W (R2), R1;
 
-LD.B R2, #1;
-ST.W (CALCULATE_NEXT_ARG_modeMaxDepth), R2;
+LD.W R2, #CALCULATE_NEXT_ARG_modeMaxDepth;
+ADD R2,R3;
+LD.B R1, #1;
+ST.W (R2), R1;
 
-ST.W (CALCULATE_NEXT_ARG_maxGameValueThatAvoidsPruning), R0;
+LD.W R2, #CALCULATE_NEXT_ARG_maxGameValueThatAvoidsPruning;
+ADD R2,R3;
+ST.W (R2), R0;
 
 include "calculate_call.asm";                                    //                                     calculate(whiteColor, 0, calculate_newEnPassantPawnIndex, 1, 0);
 
@@ -710,13 +766,31 @@ BNE calculate__castlingIsProhibited;                             //             
 LD.B R0, (SP + CALCULATE_LOCAL_originPieceIsOnOriginalSquare);
 BEQ calculate__castlingIsProhibited;                             //                                 originPieceIsOnOriginalSquare &&
 
+MOVE R0,SP;
+MOVE R3,R0;
+LD.W R2, #CALCULATE_NEXT_ARG_opponentPieceColor;
+ADD R2,R3;
 LD.B R0, (SP + CALCULATE_LOCAL_originPieceColor);
-ST.W (CALCULATE_NEXT_ARG_opponentPieceColor), R0;
+ST.W (R2), R0;
+
 LD.B R0, #0;
-ST.W (CALCULATE_NEXT_ARG_depth), R0;
-ST.W (CALCULATE_NEXT_ARG_enPassantPawnIndex), R0;
-ST.W (CALCULATE_NEXT_ARG_modeMaxDepth), R0;
-ST.W (CALCULATE_NEXT_ARG_maxGameValueThatAvoidsPruning), R0;
+
+LD.W R2, #CALCULATE_NEXT_ARG_depth;
+ADD R2,R3;
+ST.W (R2), R0;
+
+LD.W R2, #CALCULATE_NEXT_ARG_enPassantPawnIndex;
+ADD R2,R3;
+ST.W (R2), R0;
+
+LD.W R2, #CALCULATE_NEXT_ARG_modeMaxDepth;
+ADD R2,R3;
+ST.W (R2), R0;
+
+LD.W R2, #CALCULATE_NEXT_ARG_maxGameValueThatAvoidsPruning;
+ADD R2,R3;
+ST.W (R2), R0;
+
 include "calculate_call.asm";
 
 LD.B R1, #10000;
@@ -990,16 +1064,32 @@ on_click__clickedIsOtherValue:                                   //     } else {
                                                                  //
 LD.W R0, #0x8000;                                                //
 MOVE SP, R0;       // reset SP                                   //
+MOVE R3,R0;                                                      //
+                                                                 //
+LD.W R2, #CALCULATE_NEXT_ARG_opponentPieceColor;                 //
+ADD R2,R3;                                                       //
 LD.B R0, #PIECE_COLOUR_BLACK;                                    //
-ST.W (CALCULATE_NEXT_ARG_opponentPieceColor), R0;                //
+ST.W (R2), R0;                                                   //
+                                                                 //
+LD.W R2, #CALCULATE_NEXT_ARG_depth;                              //
+ADD R2,R3;                                                       //
 LD.B R0, #0;                                                     //
-ST.W (CALCULATE_NEXT_ARG_depth), R0;                             //
-LD.B R0, calculate_newEnPassantPawnIndex;                        //
-ST.W (CALCULATE_NEXT_ARG_enPassantPawnIndex), R0;                //
-LD.B R0, #MODE1_CHECK_CAN_MOVE;                                  //
-ST.W (CALCULATE_NEXT_ARG_modeMaxDepth), R0;                      //
-LD.W R0, #0;                                                     //
-ST.W (CALCULATE_NEXT_ARG_maxGameValueThatAvoidsPruning), R0;     //
+ST.W (R2), R0;                                                   //
+                                                                 //
+LD.W R2, #CALCULATE_NEXT_ARG_enPassantPawnIndex;                 //
+ADD R2,R3;                                                       //
+LD.B R1, calculate_newEnPassantPawnIndex;                        //
+ST.W (R2), R1;                                                   //
+                                                                 //
+LD.W R2, #CALCULATE_NEXT_ARG_modeMaxDepth;                       //
+ADD R2,R3;                                                       //
+LD.B R1, #MODE1_CHECK_CAN_MOVE;                                  //
+ST.W (R2), R1;                                                   //
+                                                                 //
+LD.W R2, #CALCULATE_NEXT_ARG_maxGameValueThatAvoidsPruning;      //
+ADD R2,R3;                                                       //
+ST.W (R2), R0;                                                   //
+                                                                 //
 include "calculate_call.asm";                                    //         calculate(PIECE_COLOUR_BLACK, 0, calculate_newEnPassantPawnIndex, MODE1_CHECK_CAN_MOVE, 0);
                                                                  //     }
 on_click__return:                                                //
