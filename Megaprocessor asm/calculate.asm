@@ -418,10 +418,14 @@ JMP calculate__origin_can_move_to_target_block_end;
                                                                  //                     }
 calculate__target_not_empty:                                     //                 } else {
 
+LD.B R3, #PIECE_ENUM_OFFBOARD;
+CMP R3,R1;
+BEQ calculate__non_empty_target_not_opponent;                    //                     const targetIsAPieceOfOppositeColor = targetSquareValue != PIECE_ENUM_OFFBOARD &&
+
 LD.B R3, #PIECE_COLOUR_MASK;
 AND R3,R1;
 LD.B R2, (SP + CALCULATE_ARG_opponentPieceColor);
-CMP R3,R2;                                                       //                     const targetIsAPieceOfOppositeColor = (targetSquareValue & PIECE_COLOUR_MASK) === opponentPieceColor;
+CMP R3,R2;                                                       //                         (targetSquareValue & PIECE_COLOUR_MASK) === opponentPieceColor;
 BNE calculate__non_empty_target_not_opponent;                    //                     if (targetIsAPieceOfOppositeColor) {
 
 LD.B R2, (SP + CALCULATE_LOCAL_originPieceIsAPawn);
@@ -464,7 +468,7 @@ ADD R2, R3;
 LD.B R0, (R2);
 LD.B R2, #PIECE_ENUM_OFFBOARD;
 CMP R0,R2;
-BNE calculate__makeMove_loop_start;                              //                         if(boardState[targetSquareIndex + singlePawnJump] === offBoardValue) {
+BNE calculate__makeMove_loop_start;                              //                         if(boardState[targetSquareIndex + singlePawnJump] === PIECE_ENUM_OFFBOARD) {
 
 LD.B R2, #PIECE_ENUM_QUEEN;
 LD.B R3, (SP + CALCULATE_LOCAL_originPieceColor);
