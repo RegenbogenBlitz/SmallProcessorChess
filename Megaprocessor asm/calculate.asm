@@ -481,7 +481,7 @@ calculate__makeMove_loop_start:                                  //             
 
 LD.B R1, #0;                                                     //                         moveGameValue = 0;
 LD.B R3, (SP + CALCULATE_LOCAL_targetSquareValue);
-BEQ calculate__target_is_empty;                                  //                         if(targetSquareValue === PIECE_ENUM_EMPTY) {
+BEQ calculate__target_is_empty;                                  //                         if(targetSquareValue !== PIECE_ENUM_EMPTY) {
                                                                  //                         {
 LD.B R2, #PIECE_ENUM_MASK;
 AND R3,R2;                                                       //                             const colorlessTargetPieceValue = targetSquareValue & PIECE_ENUM_MASK;
