@@ -39,15 +39,15 @@ DB PIECE_GAMEVALUE_ROOK;
 DB PIECE_GAMEVALUE_QUEEN;
 
 calculate_rook_move_directions:
-DB -1, 1, -10, 10;                   // rook move directions (& king, queen)
+DW -1, 1, -10, 10;                   // rook move directions (& king, queen)
 calculate_bishop_move_directions:
-DB -11, -9, 9, 11;                   // bishop move directions (& king, queen)
+DW -11, -9, 9, 11;                   // bishop move directions (& king, queen)
 calculate_blackpawn_move_directions:
-DB 9, 11, 10, 20;
+DW 9, 11, 10, 20;
 calculate_whitepawn_move_directions:
-DB -11, -9, -10, -20;
+DW -11, -9, -10, -20;
 calculate_knight_move_directions:
-DB -21, -19, -12, -8, 8, 12, 19, 21;
+DW -21, -19, -12, -8, 8, 12, 19, 21;
 
 calculate_initial_move_direction_indexes:
 DW 0;
@@ -360,8 +360,6 @@ LD.B R3, #8;
 calculate_originSquareValue_isNot8Directional:
 ST.B (SP + CALCULATE_LOCAL_moveDirectionNumber), R3;             //             moveDirectionNumber = (colorlessOriginPieceValue & 2) ? 8 : 4; // number of move directions: pawn 4, king 8, knight 8, bishop 4, rook 4, queen 8
 
-NOP;NOP;NOP;
-NOP;
 ADD R1,R1;  // double as each value is a word
 LD.W R2, #calculate_initial_move_direction_indexes;
 ADD R2,R1;
@@ -374,7 +372,7 @@ ST.B (SP + CALCULATE_LOCAL_targetSquareIndex), R0;               //             
 calculate_more_moves_loop_start:                                 //             do {
 LD.B R0, (SP + CALCULATE_LOCAL_targetSquareIndex);
 LD.W R2, (SP + CALCULATE_LOCAL_moveDirectionIndex);
-LD.B R1, (R2);
+LD.W R1, (R2);
 ADD R0,R1;
 ST.B (SP + CALCULATE_LOCAL_targetSquareIndex), R0;               //                 targetSquareIndex += moveDirections[moveDirectionIndex];
 
@@ -1000,9 +998,9 @@ BNE calculate_handleOriginPiece_blockEnd;                        //             
 // Falls through to calculate__remainingMovesAreValidForPiece
 
 calculate__remainingMovesAreValidForPiece:                       //                     if (remainingMovesAreValidForPiece) {
-LD.B R0, (SP + CALCULATE_LOCAL_moveDirectionIndex);
+LD.W R0, (SP + CALCULATE_LOCAL_moveDirectionIndex);
 INC R0;
-ST.B (SP + CALCULATE_LOCAL_moveDirectionIndex), R0;              //                         moveDirectionIndex++;
+ST.W (SP + CALCULATE_LOCAL_moveDirectionIndex), R0;              //                         moveDirectionIndex++;
 
 LD.B R0, (SP + CALCULATE_LOCAL_moveDirectionNumber);
 DEC R0;
