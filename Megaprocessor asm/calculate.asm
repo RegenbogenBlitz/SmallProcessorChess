@@ -255,7 +255,7 @@ CMP R0,R1;
 BLE calculate__was_not_in_check;
 LD.B R2, #BOOL_TRUE;
 calculate__was_not_in_check:
-ST.B (SP + CALCULATE_LOCAL_originPlayerIsInCheck), R0;           //         originPlayerIsInCheck = calculateResult > 10000;
+ST.B (SP + CALCULATE_LOCAL_originPlayerIsInCheck), R2;           //         originPlayerIsInCheck = calculateResult > 10000;
 
 calculate_originPlayerIsInCheck_notModeIsZero:                   //     } else {
                                                                  //         originPlayerIsInCheck = false;
