@@ -48,14 +48,23 @@ GEN_IO_INPUT                    equ     GEN_IO_BASE + 2;
 // *************************************
 // The program....
 
-global_cursor_square_index: DB SQUARE_INDEX_E1;
-global_selected_square_index: DB SQUARE_INDEX_E1;
+global_cursor_square_index: DB;
+global_selected_square_index: DB;
 
 NOP;
 NOP;
 NOP;
 
 start:
+LD.W R0, #0x8000;
+MOVE SP, R0; // reset SP
+
+JSR calculate__reset;
+
+LD.B R1, #SQUARE_INDEX_E1;
+ST.B global_cursor_square_index, R1;
+ST.B global_selected_square_index, R1;
+
 LD.W R0, #main_return_from_draw_board;
 JMP draw_board;                              // draw_board()
 main_return_from_draw_board:
