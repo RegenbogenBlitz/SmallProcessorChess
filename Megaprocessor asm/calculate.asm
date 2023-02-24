@@ -869,7 +869,13 @@ calculate__draw_board_return_after_found_move:
 LD.B R0, (SP + CALCULATE_LOCAL_originPieceColor);
 LD.B R1, #PIECE_COLOUR_WHITE;
 CMP R0,R1;
-BNE calculate__notWhiteFoundMove;                                //                                 if (originPieceColor == whiteColor) {
+BEQ calculate__whiteFoundMove;                                   //                                 if (originPieceColor == whiteColor) {
+JMP calculate__notWhiteFoundMove;
+
+calculate__whiteFoundMove:
+NOP;
+
+include "draw_thinking.asm";
 
 MOVE R0,SP;
 MOVE R3,R0;
@@ -1247,11 +1253,13 @@ BNE on_click__clickedIsWhitePiece;                               //     if (boar
 JMP on_click__clickedIsOtherValue;                               //
 on_click__clickedIsWhitePiece:                                   //
 ST.B global_selected_square_index, R0;                           //         global_selected_square_index = calculate_clickedBoardIndex;
-                                                                 //
 LD.W R0, #on_click__return;                                      //         // TODO improve performance by refreshing just the relevant squares
 JMP draw_board;                                                  //         draw_board();
                                                                  //
 on_click__clickedIsOtherValue:                                   //     } else {
+NOP;                                                             //
+                                                                 //
+include "draw_checking.asm";                                     //
                                                                  //
 LD.W R0, #0x8000;                                                //
 MOVE SP, R0;       // reset SP                                   //
