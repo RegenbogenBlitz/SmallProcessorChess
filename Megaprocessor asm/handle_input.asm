@@ -4,6 +4,7 @@ IO_SWITCH_FLAG_DOWN             EQU     0x0002;
 IO_SWITCH_FLAG_LEFT             EQU     0x0004;
 IO_SWITCH_FLAG_RIGHT            EQU     0x0008;
 IO_SWITCH_FLAG_CROSS            EQU     0x0080;
+IO_SWITCH_FLAG_R1               EQU     0x0400;
 
                                          // ** R0 = input
                                          // void handle_input(input) {
@@ -118,6 +119,13 @@ JMP draw_piece;                          //         draw_piece(old_square_index)
                                          //         return;
 
 handle_input_cross_is_not_pressed:       //     }
+
+LD.W R1,#IO_SWITCH_FLAG_R1;
+AND R1,R0;
+BNE handle_input_r1_is_not_pressed;      //     if(input & IO_SWITCH_FLAG_R1 != 0) {
+                                         //     } else {
+JMP start;                               //         goto start;
+handle_input_r1_is_not_pressed:          //     }
 
 JMP handle_input_return;                 //     return;
                                          // }
