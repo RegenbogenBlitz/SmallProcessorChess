@@ -392,7 +392,7 @@ ST.W (SP + CALCULATE_LOCAL_bestGameValue), R0;                   //     bestGame
 LD.B R0, #BOOL_FALSE;
 ST.B (SP + CALCULATE_LOCAL_originPlayerIsInCheck), R0;
 LD.B R0, (SP + CALCULATE_ARG_modeMaxDepth);
-BEQ calculate_originPlayerIsInCheck_notModeIsZero;               //     if(modeMaxDepth != 0) {
+BEQ calculate_originPlayerIsInCheck_notModeIsZero;               //     if(modeMaxDepth != MODE0_CHECK_FOR_CHECK) {
 
 MOVE R0,SP;
 MOVE R3,R0;
@@ -458,8 +458,23 @@ NEG R1;                                                          //         sing
 calculate_singlePawnJump_black:                                  //     }
 ST.W (SP + CALCULATE_LOCAL_singlePawnJump), R1;
 
-LD.B R0, #21;
-ST.B (SP + CALCULATE_LOCAL_originSquareIndex), R0;               //     originSquareIndex = 21;
+LD.B R2, (SP + CALCULATE_ARG_depth);
+BNE calculate__notDepth0AndMode1;                                //     if (depth === 0 &&
+
+LD.B R2, #MODE1_CHECK_CAN_MOVE;
+LD.B R1, (SP + CALCULATE_ARG_modeMaxDepth);
+CMP R1,R2;
+BNE calculate__notDepth0AndMode1;                                //          modeMaxDepth == MODE1_CHECK_CAN_MOVE) {
+
+LD.B R0, global_selected_square_index;                           //         originSquareIndex = global_selected_square_index;
+JMP calculate__checkDepthAndModeForInitialOriginSquareIndex;
+
+calculate__notDepth0AndMode1:                                    //     } else {
+LD.B R0, #21;                                                    //         originSquareIndex = 21;
+
+calculate__checkDepthAndModeForInitialOriginSquareIndex:         //     }
+ST.B (SP + CALCULATE_LOCAL_originSquareIndex), R0;
+
 calculate_forloop_start:                                         //     do {
 
 LD.W R2, #boardState;
