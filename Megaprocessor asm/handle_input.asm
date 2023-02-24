@@ -100,18 +100,55 @@ JMP handle_input__update_old_square;     //             goto update_old_square;
 
 handle_input__move_piece:                //         move_piece:
 
-LD.B R2,global_cursor_square_index;
-LD.B R3, #board;
-ADD R3,R2;
 
 LD.B R1,global_selected_square_index;    //         old_square_index = global_selected_square_index;
+
 LD.B R2, #board;
 ADD R2,R1;
-LD.B R0, (R2);
+LD.B R0, (R2);                           //         old_square_value = board[global_selected_square_index]
 
-ST.B (R3), R0;                           //         board[global_cursor_square_index] = board[global_selected_square_index];
+LD.B R3,global_cursor_square_index;
+
+LD.B R2, #21;
+CMP R3,R2;
+BLT handle_input__not_promotion;         //         if(((global_cursor_square_index >= 21 &&
+
+LD.B R2, #28;
+CMP R3,R2;
+BLE handle_input__is_promotion;          //             global_cursor_square_index <= 28) ||
+
+LD.B R2, #98;
+CMP R3,R2;
+BGT handle_input__not_promotion;         //             (global_cursor_square_index <= 98 &&
+
+LD.B R2, #91;
+CMP R3,R2;
+BLT handle_input__not_promotion;         //             global_cursor_square_index >= 91)) &&
+
+handle_input__is_promotion:
+
+LD.B R2, #PIECE_TYPE_MASK;
+AND R2,R0;
+LD.B R1, #PIECE_ENUM_PAWN;
+CMP R2,R1;
+BNE handle_input__not_promotion;         //             old_square_value & PIECE_TYPE_MASK == PIECE_ENUM_PAWN) {
+
+LD.B R2, #PIECE_TYPE_MASK;
+INV R2;
+AND R0,R2;
+LD.B R2, #PIECE_ENUM_QUEEN;              //             // change pawn to queen
+OR R0,R2;                                //             old_square_value = (old_square_value & !PIECE_TYPE_MASK) | PIECE_ENUM_QUEEN;
+
+handle_input__not_promotion:             //         }
+
+LD.B R2, #board;
+ADD R3,R2;
+ST.B (R3), R0;                           //         board[global_cursor_square_index] = old_square_value;
+
+LD.B R1,global_selected_square_index;
 LD.B R0, #EMPTY_SQUARE_VALUE;
-ST.B (R2), R0;                           //         board[global_selected_square_index] = EMPTY_SQUARE_VALUE;
+ADD R2,R1;
+ST.B (R2), R0;                           //         board[old_square_index] = EMPTY_SQUARE_VALUE;
 
 handle_input__update_old_square:         //         update_old_square:
 LD.W R0, #handle_input_return;
