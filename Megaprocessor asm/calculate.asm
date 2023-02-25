@@ -1363,9 +1363,18 @@ AND R3,R1;                                                       //     const cl
 BNE on_click__clickedIsWhitePiece;                               //     if (boardValueIsWhitePiece) {
 JMP on_click__clickedIsOtherValue;                               //
 on_click__clickedIsWhitePiece:                                   //
-ST.B global_selected_square_index, R0;                           //         global_selected_square_index = calculate_clickedBoardIndex;
-LD.W R0, #on_click__return;                                      //         // TODO improve performance by refreshing just the relevant squares
-JMP draw_board;                                                  //         draw_board();
+                                                                 //
+LD.B R1, global_selected_square_index;                           //         old_global_selected_square_index = global_selected_square_index;
+LD.B R2, calculate_clickedBoardIndex;                            //
+ST.B global_selected_square_index, R2;                           //         global_selected_square_index = calculate_clickedBoardIndex;
+                                                                 //
+LD.W R0, #on_click__return_redraw_old_selected_square;           //
+JMP draw_piece;                                                  //         draw_piece(old_global_selected_square_index);
+on_click__return_redraw_old_selected_square:                     //
+                                                                 //
+LD.B R1, global_selected_square_index;                           //
+LD.W R0, #on_click__return;                                      //
+JMP draw_piece;                                                  //         draw_piece(global_selected_square_index);
                                                                  //
 on_click__clickedIsOtherValue:                                   //     } else {
 NOP;                                                             //
