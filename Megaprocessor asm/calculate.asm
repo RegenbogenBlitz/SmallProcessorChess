@@ -1164,10 +1164,10 @@ BNE calculate__betterMoveFound_blockEnd;                         //             
 LD.B R1, (SP + CALCULATE_ARG_depth);
 BNE calculate__betterMoveFound_blockEnd;                         //                             depth === 0 &&
 
-//COUNTER_ADDRESS EQU #0x8000
-//LD.W R2, COUNTER_ADDRESS;
-LD.W R2, calculate_randomValue;
-INC R2;
+COUNTER_ADDRESS EQU 0x8000;
+LD.W R2, COUNTER_ADDRESS;
+//LD.W R2, calculate_randomValue;
+//INC R2;
 ST.W calculate_randomValue, R2; // Temporary "random" generator
 
 BTST R2, #2;  // Test 3rd LSB
