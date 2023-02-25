@@ -833,17 +833,26 @@ ST.W (SP + CALCULATE_LOCAL_moveGameValue), R1;
 LD.B R0, #BOOL_TRUE;
 ST.B (SP + CALCULATE_LOCAL_castlingIsProhibited), R0;            //                         castlingIsProhibited = true;
 
+HACK_MAX_DEPTH EQU 2;
 LD.B R2, (SP + CALCULATE_ARG_modeMaxDepth);
+LD.B R3, #2;                                                     //                         // performance hack!!!
+CMP R2,R3;
+BNE calculate__dont_tweak_max_depth;                             //                         var maxDepth = modeMaxDepth == 2 ?
+LD.B R2, #HACK_MAX_DEPTH;                                        //                             1
+calculate__dont_tweak_max_depth:                                 //                             : modeMaxDepth;
+
 LD.B R3, (SP + CALCULATE_ARG_depth);
 CMP R2,R3;
 BGT calculate__can_go_deeper;                                    //                         if (modeMaxDepth > depth ||
 
+LD.B R2, (SP + CALCULATE_ARG_modeMaxDepth);
 LD.B R0, #2;
 CMP R2,R0;
 BNE calculate__cannot_go_deeper;                                 //                             (modeMaxDepth === 2 &&
 
+LD.B R2, #HACK_MAX_DEPTH;
 CMP R2,R3;
-BNE calculate__cannot_go_deeper;                                 //                             modeMaxDepth === depth &&
+BNE calculate__cannot_go_deeper;                                 //                             maxDepth === depth &&
 
 CMP R1,R0;
 BGT calculate__can_go_deeper;                                    //                             (moveGameValue > 2 ||
