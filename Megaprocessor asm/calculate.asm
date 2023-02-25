@@ -475,6 +475,60 @@ LD.B R0, #21;                                                    //         orig
 calculate__checkDepthAndModeForInitialOriginSquareIndex:         //     }
 ST.B (SP + CALCULATE_LOCAL_originSquareIndex), R0;
 
+LD.B R2, (SP + CALCULATE_ARG_modeMaxDepth);
+BEQ calculate__clearprogress_mode0;                              //     if (modeMaxDepth != MODE0_CHECK_FOR_CHECK) {
+
+LD.B R2, (SP + CALCULATE_ARG_depth);
+BNE calculate__clearprogress_notDepth0;                          //         if (depth == 0) {
+
+LD.W R2,#0xA0E0;
+LD.B R1,#0;
+ST.W (R2++),R1;
+ST.W (R2++),R1;
+ST.W (R2++),R1;
+ST.W (R2++),R1;                                                  //             clearDepth0Progress();
+//fall through                                                   //             clearDepth1Progress();
+//fall through                                                   //             clearDepth2Progress();
+//fall through                                                   //             clearMode0Progress();
+
+calculate__clearprogress_notDepth0:
+
+LD.B R1,#1;
+CMP R2,R1;
+BNE calculate__clearprogress_notDepth1;                          //         } else if (depth == 1) {
+
+LD.W R2,#0xA0E8;
+LD.B R1,#0;
+ST.W (R2++),R1;
+ST.W (R2++),R1;
+ST.W (R2++),R1;
+ST.W (R2++),R1;                                                  //             clearDepth1Progress();
+//fall through                                                   //             clearDepth2Progress();
+//fall through                                                   //             clearMode0Progress();
+
+calculate__clearprogress_notDepth1:                              //         } else{
+
+LD.W R2,#0xA0F0;
+LD.B R1,#0;
+ST.W (R2++),R1;
+ST.W (R2++),R1;
+ST.W (R2++),R1;
+ST.W (R2++),R1;                                                  //             clearDepth2Progress();
+//fall through                                                   //             clearMode0Progress();
+
+                                                                 //         }
+
+calculate__clearprogress_mode0:                                  //     } else {
+
+LD.W R2,#0xA0F8;
+LD.B R1,#0;
+ST.W (R2++),R1;
+ST.W (R2++),R1;
+ST.W (R2++),R1;
+ST.W (R2++),R1;                                                  //         clearMode0Progress();
+
+                                                                 //     }
+
 calculate_forloop_start:                                         //     do {
 
 LD.W R2, #boardState;
@@ -500,10 +554,67 @@ BEQ calculate_originSquareValue_notOriginColor;                  //             
 JMP calculate_handleOriginPiece_blockEnd;
 calculate_originSquareValue_notOriginColor:
 
+                                                                 //         let progressStartAddress;
+LD.B R2, (SP + CALCULATE_ARG_modeMaxDepth);
+BNE calculate__increaseprogress_notMode0;                        //         if (modeMaxDepth == MODE0_CHECK_FOR_CHECK) {
+
+LD.W R2,#0xA0F8;                                                 //             progressStartAddress = 0xA0F8;
+
+JMP calculate__increaseprogress;
+calculate__increaseprogress_notMode0:                            //         } else {
+
+LD.B R2, (SP + CALCULATE_ARG_depth);
+BNE calculate__increaseprogress_notDepth0;                       //             if (depth == 0) {
+
+LD.W R2,#0xA0E0;                                                 //                 progressStartAddress = 0xA0E0;
+
+JMP calculate__increaseprogress;
+calculate__increaseprogress_notDepth0:
+
+LD.B R1,#1;
+CMP R2,R1;                                                       //             } else if (depth == 1) {
+BNE calculate__increaseprogress_notDepth1;
+
+LD.W R2,#0xA0E8;                                                 //                 progressStartAddress = 0xA0E8;
+
+JMP calculate__increaseprogress;
+calculate__increaseprogress_notDepth1:                           //             } else{
+
+LD.W R2,#0xA0F0;                                                 //                 progressStartAddress = 0xA0F0;
+
+                                                                 //             }
+                                                                 //         }
+
+calculate__increaseprogress:
+LD.W R3, #0xFFFF;
+LD.W R1,(R2++);
+CMP R3,R1;
+BNE calculate__increaseprogress_done;                            //             if(progressStartAddress++* < FFFF) { progressAddress = progressStartAddress}
+LD.W R1,(R2++);
+CMP R3,R1;
+BNE calculate__increaseprogress_done;                            //             else if(progressStartAddress++* < FFFF) { progressAddress = progressStartAddress}
+LD.W R1,(R2++);
+CMP R3,R1;
+BNE calculate__increaseprogress_done;                            //             else if(progressStartAddress++* < FFFF) { progressAddress = progressStartAddress}
+LD.W R1,(R2++);                                                  //             else                                    { progressAddress = progressStartAddress++}
+
+calculate__increaseprogress_done:
+ADDQ R2,#-2;                                                     //             progressAddress--;
+ADD R1,R1;
+ADD R1,R1;
+ADD R1,R1;
+ADD R1,R1;
+LD.W R3, #15;
+ADD R1,R3;
+ST.W (R2),R1;                                                    //             progressAddress*++;
+
+                                                                 //         } else { continue; }
+
 LD.B R1, #PIECE_VALUE_MASK;
 AND R1,R0;
 ST.B (SP + CALCULATE_LOCAL_movedOriginPieceValue), R1;           //             movedOriginPieceValue = originSquareValue & PIECE_VALUE_MASK;
 
+LD.B R2, (SP + CALCULATE_LOCAL_originPieceColor);
 XOR R2,R1;
 ST.B (SP + CALCULATE_LOCAL_colorlessOriginPieceValue), R2;       //             colorlessOriginPieceValue = movedOriginPieceValue ^ originPieceColor; // pawn 1, king 2, knight 3, bishop 4, rook 5, queen 6
 
